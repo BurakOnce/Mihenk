@@ -1,0 +1,12 @@
+# Normalise line endings on commit. Without this the repo carries CRLF from
+# Windows into Fabric notebooks and .sql files, which shows up as whole-file
+# diffs the first time anyone edits them on Linux.
+* text=auto eol=lf
+
+# Notebooks are JSON - keep them diffable rather than treating them as binary.
+*.ipynb text eol=lf
+
+# Generated data files, if any ever get committed deliberately.
+*.csv text eol=lf
+*.xlsx binary
+*.pbix binary

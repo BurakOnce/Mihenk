@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mihenk Doğrulama Paneli</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  :root{
+    --bg: #f6f4f0;
+    --surface: #ffffff;
+    --surface-2: #efece5;
+    --ink: #211d18;
+    --ink-soft: #57503f;
+    --ink-mute: #928a76;
+    --line: #e2ddd2;
+    --line-strong: #cfc8b8;
+    --accent: #c4491d;
+    --accent-soft: #f2e2d8;
+    --accent-ink: #7a2c10;
+    --good: #1f7a4c;
+    --good-soft: #e2efe4;
+    --warn: #a1720b;
+    --warn-soft: #f5ecd6;
+    --bad: #b23a2e;
+    --bad-soft: #f6e2df;
+    --new: #c4491d;
+    --used: #b9ac8e;
+    --dom: #1f7a4c;
+    --imp: #a1720b;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #17140f;
+      --surface: #211d17;
+      --surface-2: #2a2519;
+      --ink: #f2ede2;
+      --ink-soft: #c9c0aa;
+      --ink-mute: #8d8570;
+      --line: #3a3324;
+      --line-strong: #4a412c;
+      --accent: #e2712f;
+      --accent-soft: #3a2415;
+      --accent-ink: #f4a677;
+      --good: #4caf7d;
+      --good-soft: #1c3226;
+      --warn: #d1a53c;
+      --warn-soft: #362c15;
+      --bad: #e0685c;
+      --bad-soft: #3a201d;
+      --new: #e2712f;
+      --used: #6f6650;
+      --dom: #4caf7d;
+      --imp: #d1a53c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17140f;
+    --surface: #211d17;
+    --surface-2: #2a2519;
+    --ink: #f2ede2;
+    --ink-soft: #c9c0aa;
+    --ink-mute: #8d8570;
+    --line: #3a3324;
+    --line-strong: #4a412c;
+    --accent: #e2712f;
+    --accent-soft: #3a2415;
+    --accent-ink: #f4a677;
+    --good: #4caf7d;
+    --good-soft: #1c3226;
+    --warn: #d1a53c;
+    --warn-soft: #362c15;
+    --bad: #e0685c;
+    --bad-soft: #3a201d;
+    --new: #e2712f;
+    --used: #6f6650;
+    --dom: #4caf7d;
+    --imp: #d1a53c;
+  }
+
+  * { box-sizing: border-box; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    padding: 40px 32px 64px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  h1,h2,h3{ font-family: 'Archivo', 'IBM Plex Sans', sans-serif; text-wrap: balance; margin: 0; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+
+  /* ---- header ---- */
+  header{
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 24px; padding-bottom: 22px; border-bottom: 2px solid var(--ink);
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 6px;
+  }
+  h1{ font-size: 30px; font-weight: 800; letter-spacing: -.01em; }
+  header p{ color: var(--ink-soft); font-size: 14px; max-width: 46ch; margin: 8px 0 0; line-height: 1.5; }
+  .status-chip{
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--good-soft); color: var(--good); border: 1px solid color-mix(in srgb, var(--good) 30%, transparent);
+    padding: 7px 13px; border-radius: 100px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  }
+  .status-chip .dot{ width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+  .fabric-chip{
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--surface-2); color: var(--ink-mute); border: 1px solid var(--line);
+    padding: 7px 13px; border-radius: 100px; font-size: 12.5px; font-weight: 500; margin-left: 8px;
+  }
+  .header-right{ display:flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+  /* ---- kpi strip ---- */
+  .kpi-row{
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden; margin-bottom: 32px;
+  }
+  .kpi{ background: var(--surface); padding: 16px 14px; }
+  .kpi .n{ font-size: 25px; font-weight: 700; font-family: 'Archivo', sans-serif; font-variant-numeric: tabular-nums; }
+  .kpi .l{ font-size: 11.5px; color: var(--ink-mute); margin-top: 3px; text-transform: uppercase; letter-spacing: .04em; }
+
+  /* ---- section / panel ---- */
+  .grid-2{ display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; margin-bottom: 18px; }
+  .grid-3{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 18px; }
+  .panel{
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px 22px 18px;
+  }
+  .panel-head{ display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; gap: 10px; }
+  .panel-head h2{ font-size: 15px; font-weight: 700; }
+  .panel-sub{ font-size: 12px; color: var(--ink-mute); margin-bottom: 14px; }
+  .panel-figure{ font-size: 12px; color: var(--ink-mute); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+
+  .legend{ display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
+  .legend span{ display: inline-flex; align-items: center; gap: 6px; }
+  .legend i{ width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  svg text{ font-family: 'IBM Plex Mono', monospace; fill: var(--ink-mute); }
+  .axis-line{ stroke: var(--line); stroke-width: 1; }
+  .gridline{ stroke: var(--line); stroke-width: 1; }
+
+  .bar-list{ display: flex; flex-direction: column; gap: 9px; }
+  .bar-row{ display: grid; grid-template-columns: 122px 1fr 46px; align-items: center; gap: 10px; }
+  .bar-row .name{ font-size: 12.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .track{ background: var(--surface-2); border-radius: 4px; height: 9px; overflow: hidden; }
+  .bar-row .fill{ height: 100%; border-radius: 4px; background: var(--accent); }
+  .bar-row .val{ font-size: 12px; text-align: right; font-family: 'IBM Plex Mono', monospace; color: var(--ink-soft); }
+
+  .dealer-item{ padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .dealer-item:last-child{ border-bottom: none; }
+  .dealer-top{ display: flex; align-items: baseline; gap: 9px; }
+  .dealer-top .rank{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-mute); width: 16px; flex-shrink: 0; }
+  .dealer-top .name{ flex: 1; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dealer-top .count{ font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  .dealer-city{ font-size: 11.5px; color: var(--ink-mute); margin: 2px 0 7px 25px; }
+  .dealer-bar{ margin-left: 25px; background: var(--surface-2); border-radius: 4px; height: 6px; overflow: hidden; }
+  .dealer-bar .fill{ height: 100%; border-radius: 4px; background: var(--accent); }
+
+  .stat-pair{ display: flex; gap: 14px; }
+  .stat-block{ flex: 1; background: var(--surface-2); border-radius: 9px; padding: 13px 14px; }
+  .stat-block .k{ font-size: 11px; color: var(--ink-mute); text-transform: uppercase; letter-spacing: .03em; }
+  .stat-block .v{ font-size: 22px; font-weight: 700; font-family: 'Archivo', sans-serif; margin-top: 3px; }
+  .stat-block .v.good{ color: var(--good); }
+  .stat-block .v.warn{ color: var(--warn); }
+
+  .mdm-bar{ display: flex; height: 30px; border-radius: 7px; overflow: hidden; border: 1px solid var(--line); }
+  .mdm-bar div{ display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:600; color:#fff; }
+  .mdm-legend{ display:flex; gap:16px; margin-top:12px; flex-wrap:wrap; }
+  .mdm-legend span{ font-size: 12px; color: var(--ink-soft); display:flex; align-items:center; gap:6px;}
+  .mdm-legend i{ width:9px; height:9px; border-radius:2px; }
+
+  .note{
+    font-size: 12px; color: var(--ink-mute); line-height: 1.55; margin-top: 12px;
+    padding-top: 12px; border-top: 1px dashed var(--line);
+  }
+  .note b{ color: var(--ink-soft); font-weight: 600; }
+
+  .tooltip{
+    position: absolute; pointer-events: none; background: var(--ink); color: var(--bg);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; padding: 7px 10px;
+    border-radius: 6px; white-space: nowrap; opacity: 0; transition: opacity .1s;
+    transform: translate(-50%, -110%); z-index: 5;
+  }
+  .chart-wrap{ position: relative; }
+
+  @media (max-width: 880px){
+    .kpi-row{ grid-template-columns: repeat(3, 1fr); }
+    .grid-2, .grid-3{ grid-template-columns: 1fr; }
+    header{ flex-direction: column; align-items: flex-start; }
+    .header-right{ align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Mihenk Veri Üretici — Doğrulama Paneli</h1>
+  </div>
+  <div class="header-right">
+    <span class="status-chip"><span class="dot"></span>6/6 fonksiyonel test geçti</span>
+  </div>
+</header>
+
+<div class="kpi-row" id="kpiRow"></div>
+
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Araç Satışı — Aylık Trend</h2>
+      <span class="panel-figure" id="salesFigure"></span>
+    </div>
+    <div class="panel-sub">44 ay · sıfır araç ve ikinci el ayrı çizgiler</div>
+    <div class="chart-wrap"><svg id="salesChart" viewBox="0 0 640 210" width="100%"></svg><div class="tooltip" id="salesTip"></div></div>
+    <div class="legend">
+      <span><i style="background:var(--new)"></i>Sıfır araç</span>
+      <span><i style="background:var(--used)"></i>İkinci el</span>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>En Çok Satan 8 Bayi</h2></div>
+    <div class="panel-sub">sözleşme sayısına göre</div>
+    <div id="dealerList"></div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Servis — İş Emri Hacmi</h2>
+      <span class="panel-figure" id="wsFigure"></span>
+    </div>
+    <div class="panel-sub">büyüme + kış lastiği / klima mevsimselliği aynı anda görünür</div>
+    <div class="chart-wrap"><svg id="wsChart" viewBox="0 0 640 210" width="100%"></svg><div class="tooltip" id="wsTip"></div></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>Servis Tipi Karması</h2></div>
+    <div class="panel-sub" id="serviceSub"></div>
+    <div class="bar-list" id="serviceMix"></div>
+  </div>
+</div>
+
+<div class="grid-3">
+  <div class="panel">
+    <div class="panel-head"><h2>Tedarikçi Zamanında Teslim</h2></div>
+    <div class="panel-sub">yurt içi vs ithal parça</div>
+    <div class="stat-pair">
+      <div class="stat-block"><div class="k">Yurt İçi</div><div class="v good" id="domRate"></div></div>
+      <div class="stat-block"><div class="k">İthal</div><div class="v warn" id="impRate"></div></div>
+    </div>
+    <div class="note" id="procNote"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Müşteri Eşleştirme (MDM)</h2></div>
+    <div class="panel-sub">DMS ↔ CRM aynı kişi, ne kadar zor eşleşiyor</div>
+    <div class="mdm-bar" id="mdmBar"></div>
+    <div class="mdm-legend" id="mdmLegend"></div>
+    <div class="note" id="mdmNote"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Veri Kalitesi Önizlemesi</h2></div>
+    <div class="panel-sub" id="dqSub"></div>
+    <div class="bar-list" id="dqList" style="max-height:168px; overflow-y:auto; padding-right:4px;"></div>
+    <div class="note"><b>Not:</b> Bu bloktaki bozukluklar bilerek eklendi — Fabric'teki DQ kuralları bunları yakalayacak. Yani "kirli veri" burada bir hata değil, test senaryosu.</div>
+  </div>
+</div>
+
+<script>
+const DATA = {"kpis": {"dealers": 40, "employees": 350, "customers": 25000, "vehicles": 42000, "sales_contracts": 29770, "repair_orders": 180066, "repair_order_lines": 626073, "purchase_lines": 49755, "warranty_claims": 24871, "recall_campaigns": 15}, "sales_trend": {"months": ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"], "new": [411, 376, 541, 449, 541, 447, 473, 348, 545, 528, 591, 844, 387, 393, 530, 724, 344, 399, 481, 474, 575, 571, 648, 800, 362, 391, 619, 567, 604, 502, 528, 504, 599, 724, 1035, 745, 425, 499, 559, 683, 548, 633, 625, 537], "used": [8, 56, 83, 94, 93, 113, 126, 94, 121, 123, 122, 181, 106, 105, 134, 175, 81, 109, 111, 136, 126, 129, 152, 210, 125, 134, 123, 130, 178, 106, 133, 122, 153, 165, 208, 211, 127, 110, 130, 167, 129, 151, 125, 146]}, "top_dealers": [{"code": "BYI038", "name": "Turan Oto", "city": "İstanbul", "count": 1657}, {"code": "BYI018", "name": "Akgün Motorlu Araçlar", "city": "Konya", "count": 1504}, {"code": "BYI033", "name": "Aslan Otomotiv", "city": "Ankara", "count": 1504}, {"code": "BYI030", "name": "Toprak Oto", "city": "Antalya", "count": 1466}, {"code": "BYI025", "name": "Ünal Otomotiv Tic. A.Ş.", "city": "Muş", "count": 1464}, {"code": "BYI028", "name": "Güneş Motorlu Araçlar", "city": "Sakarya", "count": 1410}, {"code": "BYI024", "name": "Doğan Otomotiv", "city": "İstanbul", "count": 1407}, {"code": "BYI002", "name": "Coşkun Otomotiv", "city": "İzmir", "count": 1370}], "workshop_trend": {"months": ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08"], "counts": [512, 477, 679, 673, 1096, 979, 1134, 1127, 1406, 1834, 2279, 2164, 2719, 2121, 2463, 2559, 3306, 2854, 3288, 2743, 3533, 3896, 4518, 5367, 4144, 3874, 4329, 4860, 5606, 5247, 5353, 4612, 6111, 6725, 7057, 8954, 6421, 6125, 7169, 7674, 6956, 9589, 8093, 7440]}, "service_mix": {"REPAIR": 52734, "MAINT": 51921, "WARRANTY": 24860, "TYRE": 23879, "BODY": 21446, "RECALL": 2880, "INSPECT": 2346}, "parts_wait_share": 0.2349, "open_orders": 1104, "procurement": {"domestic_on_time": 0.8696, "import_on_time": 0.7796, "domestic_lines": 23085, "import_lines": 26670}, "mdm": {"EASY": 13315, "NONE": 8713, "HARD": 2972}, "mdm_presence": {"BOTH": 16287, "DMS_ONLY": 4966, "CRM_ONLY": 3747}, "warranty": {"status": {"APPROVED": 21526, "REJECTED": 2439, "PENDING": 906}, "claimed": 484370953.0, "approved": 400356378.0, "approval_rate": 0.8265}, "recall": {"coverage_rows": 3206, "completed": 2419}, "dq_defects": {"PART_NO_ORPHAN": 2240, "WARRANTY_AMOUNT_OVERFLOW": 1878, "VIN_CHECK_DIGIT": 1673, "ODOMETER_ROLLBACK": 1375, "PLATE_FORMAT": 1294, "VIN_FORMAT": 1259, "RO_DATE_SEQUENCE": 1074, "LABOUR_HOURS_NEGATIVE": 912, "PLATE_PROVINCE": 745, "VIN_ORPHAN": 720, "BUSINESS_KEY_NULL": 630, "LABOUR_HOURS_EXCESSIVE": 456, "DATE_FORMAT_INCONSISTENT": 298, "VIN_DUPLICATE_NEW_SALE": 72}, "dq_total_rows": 885664, "dq_total_defects": 14626};
+
+function fmt(n){ return new Intl.NumberFormat('tr-TR').format(Math.round(n)); }
+function pct(n){ return (n*100).toFixed(1).replace('.', ',') + '%'; }
+
+// ---------- KPI strip ----------
+const kpiDefs = [
+  ['Bayi', DATA.kpis.dealers],
+  ['Müşteri', DATA.kpis.customers],
+  ['Araç (VIN)', DATA.kpis.vehicles],
+  ['Satış Sözleşmesi', DATA.kpis.sales_contracts],
+  ['İş Emri', DATA.kpis.repair_orders],
+  ['Satın Alma Satırı', DATA.kpis.purchase_lines],
+];
+document.getElementById('kpiRow').innerHTML = kpiDefs.map(([l,n]) =>
+  `<div class="kpi"><div class="n mono">${fmt(n)}</div><div class="l">${l}</div></div>`
+).join('');
+
+// ---------- generic line chart with two series ----------
+function lineChart(svgId, tipId, months, seriesA, seriesB, colorA, colorB, labelA, labelB){
+  const svg = document.getElementById(svgId);
+  const W = 640, H = 210, padL = 34, padR = 8, padT = 10, padB = 24;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const all = seriesB ? seriesA.concat(seriesB) : seriesA;
+  const max = Math.max(...all) * 1.12;
+  const n = months.length;
+  const x = i => padL + (innerW * i) / (n - 1);
+  const y = v => padT + innerH - (innerH * v) / max;
+
+  function path(series){
+    return series.map((v,i) => `${i===0?'M':'L'} ${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+  }
+
+  let gridlines = '';
+  const steps = 4;
+  for(let s=0; s<=steps; s++){
+    const v = (max/steps)*s;
+    const yy = y(v);
+    gridlines += `<line class="gridline" x1="${padL}" x2="${W-padR}" y1="${yy}" y2="${yy}"/>`;
+    gridlines += `<text x="${padL-6}" y="${yy+3}" font-size="9" text-anchor="end">${fmt(v)}</text>`;
+  }
+
+  const yearTicks = [];
+  months.forEach((m,i) => { if(m.endsWith('-01')) yearTicks.push([i, m.slice(0,4)]); });
+
+  let axisLabels = yearTicks.map(([i,label]) =>
+    `<text x="${x(i)}" y="${H-6}" font-size="9.5" text-anchor="middle">${label}</text>`
+  ).join('');
+
+  let hitAreas = months.map((m,i) =>
+    `<rect x="${x(i)-innerW/(2*n)}" y="${padT}" width="${innerW/n}" height="${innerH}" fill="transparent"
+       data-i="${i}" class="hitarea"/>`
+  ).join('');
+
+  svg.innerHTML = `
+    ${gridlines}
+    <line class="axis-line" x1="${padL}" x2="${W-padR}" y1="${padT+innerH}" y2="${padT+innerH}"/>
+    ${seriesB ? `<path d="${path(seriesB)}" fill="none" stroke="${colorB}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    <path d="${path(seriesA)}" fill="none" stroke="${colorA}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${x(n-1)}" cy="${y(seriesA[n-1])}" r="3.4" fill="${colorA}"/>
+    ${seriesB ? `<circle cx="${x(n-1)}" cy="${y(seriesB[n-1])}" r="3" fill="${colorB}"/>` : ''}
+    ${axisLabels}
+    ${hitAreas}
+    <line id="${svgId}-cross" x1="0" x2="0" y1="${padT}" y2="${padT+innerH}" stroke="var(--ink-mute)" stroke-width="1" stroke-dasharray="2,2" opacity="0"/>
+  `;
+
+  const tip = document.getElementById(tipId);
+  const wrap = svg.parentElement;
+  svg.querySelectorAll('.hitarea').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const i = +el.dataset.i;
+      document.getElementById(svgId+'-cross').setAttribute('x1', x(i));
+      document.getElementById(svgId+'-cross').setAttribute('x2', x(i));
+      document.getElementById(svgId+'-cross').setAttribute('opacity', 1);
+      const rect = svg.getBoundingClientRect();
+      const scale = rect.width / W;
+      tip.style.left = (x(i)*scale) + 'px';
+      tip.style.top = (y(seriesA[i])*scale) + 'px';
+      tip.innerHTML = seriesB
+        ? `${months[i]}<br>${labelA} ${fmt(seriesA[i])} · ${labelB} ${fmt(seriesB[i])}`
+        : `${months[i]}<br>${labelA} ${fmt(seriesA[i])}`;
+      tip.style.opacity = 1;
+    });
+    el.addEventListener('mouseleave', () => {
+      document.getElementById(svgId+'-cross').setAttribute('opacity', 0);
+      tip.style.opacity = 0;
+    });
+  });
+}
+
+lineChart('salesChart','salesTip', DATA.sales_trend.months, DATA.sales_trend.new, DATA.sales_trend.used,
+          'var(--new)','var(--used)','Sıfır','İkinci el');
+lineChart('wsChart','wsTip', DATA.workshop_trend.months, DATA.workshop_trend.counts, null,
+          'var(--accent)', null, 'İş emri', null);
+
+document.getElementById('salesFigure').textContent =
+  fmt(DATA.sales_trend.new.reduce((a,b)=>a+b,0) + DATA.sales_trend.used.reduce((a,b)=>a+b,0)) + ' sözleşme';
+document.getElementById('wsFigure').textContent = fmt(DATA.kpis.repair_orders) + ' iş emri';
+
+// ---------- dealer ranking ----------
+const maxDealer = DATA.top_dealers[0].count;
+document.getElementById('dealerList').innerHTML = DATA.top_dealers.map((d,i) => `
+  <div class="dealer-item">
+    <div class="dealer-top">
+      <span class="rank">${(i+1).toString().padStart(2,'0')}</span>
+      <span class="name">${d.name}</span>
+      <span class="count mono">${fmt(d.count)}</span>
+    </div>
+    <div class="dealer-city">${d.city}</div>
+    <div class="dealer-bar"><div class="fill" style="width:${(d.count/maxDealer*100).toFixed(0)}%"></div></div>
+  </div>
+`).join('');
+
+// ---------- service mix ----------
+const svcLabels = {REPAIR:'Arıza Onarımı', MAINT:'Periyodik Bakım', WARRANTY:'Garanti', TYRE:'Lastik/Mevsimsel',
+                   BODY:'Kaporta-Boya', RECALL:'Geri Çağırma', INSPECT:'Ekspertiz'};
+const svcEntries = Object.entries(DATA.service_mix);
+const svcMax = Math.max(...svcEntries.map(e=>e[1]));
+document.getElementById('serviceMix').innerHTML = svcEntries.map(([k,v]) => `
+  <div class="bar-row">
+    <div class="name">${svcLabels[k]||k}</div>
+    <div class="track"><div class="fill" style="width:${(v/svcMax*100).toFixed(0)}%"></div></div>
+    <div class="val">${fmt(v)}</div>
+  </div>
+`).join('');
+document.getElementById('serviceSub').textContent =
+  `parça bekleyen iş emri oranı: ${pct(DATA.parts_wait_share)} · açık iş emri: ${fmt(DATA.open_orders)}`;
+
+// ---------- procurement ----------
+document.getElementById('domRate').textContent = pct(DATA.procurement.domestic_on_time);
+document.getElementById('impRate').textContent = pct(DATA.procurement.import_on_time);
+document.getElementById('procNote').innerHTML =
+  `<b>${fmt(DATA.procurement.domestic_lines)}</b> yurt içi, <b>${fmt(DATA.procurement.import_lines)}</b> ithal satır. Yurt içi tedarikçiler daha güvenilir — bu jeneratörde bilerek kurulan bir ilişki, gerçek bir tedarik zinciri sinyalini taklit ediyor.`;
+
+// ---------- mdm ----------
+const mdmColors = {EASY:'var(--good)', HARD:'var(--warn)', NONE:'var(--ink-mute)'};
+const mdmLabels = {EASY:'Kolay eşleşme', HARD:'Zor eşleşme', NONE:'Tek sistemde'};
+const mdmTotal = Object.values(DATA.mdm).reduce((a,b)=>a+b,0);
+document.getElementById('mdmBar').innerHTML = Object.entries(DATA.mdm).map(([k,v]) =>
+  `<div style="width:${(v/mdmTotal*100).toFixed(2)}%; background:${mdmColors[k]}">${(v/mdmTotal*100).toFixed(0)}%</div>`
+).join('');
+document.getElementById('mdmLegend').innerHTML = Object.entries(DATA.mdm).map(([k,v]) =>
+  `<span><i style="background:${mdmColors[k]}"></i>${mdmLabels[k]} — ${fmt(v)}</span>`
+).join('');
+const bothCount = DATA.mdm_presence.BOTH;
+const hardShare = DATA.mdm.HARD / bothCount;
+document.getElementById('mdmNote').innerHTML =
+  `<b>${fmt(bothCount)}</b> kişi her iki sistemde de var. Bunların <b>${pct(hardShare)}</b>'i isim/telefon farklı yazılmış — eşleştirici bunları çözmek zorunda.`;
+
+// ---------- data quality preview ----------
+const dqLabels = {
+  PART_NO_ORPHAN:'Öksüz parça no', WARRANTY_AMOUNT_OVERFLOW:'Garanti tutarı taşması',
+  VIN_CHECK_DIGIT:'VIN check digit hatalı', ODOMETER_ROLLBACK:'Km geri gitmesi',
+  PLATE_FORMAT:'Plaka format hatası', VIN_FORMAT:'VIN format hatası',
+  RO_DATE_SEQUENCE:'Tarih sırası bozuk', LABOUR_HOURS_NEGATIVE:'Negatif işçilik saati',
+  PLATE_PROVINCE:'Geçersiz il kodu', VIN_ORPHAN:'Öksüz VIN',
+  BUSINESS_KEY_NULL:'Boş iş anahtarı', LABOUR_HOURS_EXCESSIVE:'Aşırı işçilik saati',
+  DATE_FORMAT_INCONSISTENT:'Tutarsız tarih formatı', VIN_DUPLICATE_NEW_SALE:'Mükerrer sıfır satış',
+};
+const dqEntries = Object.entries(DATA.dq_defects);
+const dqMax = Math.max(...dqEntries.map(e=>e[1]));
+document.getElementById('dqList').innerHTML = dqEntries.map(([k,v]) => `
+  <div class="bar-row" style="grid-template-columns: 130px 1fr 38px;">
+    <div class="name" style="font-size:11.5px;">${dqLabels[k]||k}</div>
+    <div class="track"><div class="fill" style="width:${(v/dqMax*100).toFixed(0)}%; background:var(--bad);"></div></div>
+    <div class="val">${fmt(v)}</div>
+  </div>
+`).join('');
+document.getElementById('dqSub').textContent =
+  `${fmt(DATA.dq_total_defects)} kusur / ${fmt(DATA.dq_total_rows)} satır — %${(DATA.dq_total_defects/DATA.dq_total_rows*100).toFixed(2).replace('.', ',')}`;
+
+</script>
+</body>
+</html>

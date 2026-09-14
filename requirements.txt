@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------------
+# MIHENK Data Platform - local Python dependencies (Phase 1)
+#
+# Setup:
+#     python -m venv .venv
+#     .venv\Scripts\activate          # PowerShell
+#     pip install -r requirements.txt
+#
+# Versions are pinned exactly. The dataset is meant to be reproducible from a
+# seed, and that guarantee is worthless if a library changes its random or
+# rounding behaviour underneath us.
+#
+# Nothing exotic here on purpose: every package below is one a reviewer will
+# recognise immediately and one this project can justify in a sentence.
+# ---------------------------------------------------------------------------
+
+# Tabular shaping and CSV / Excel output.
+# NOTE: this is pandas 3.x. Copy-on-write and the string dtype defaults differ
+# from 2.x - relevant once we start mutating frames in Phase 1.
+pandas==3.0.5
+
+# Synthetic names, addresses and company names. Has a Turkish (tr_TR) locale,
+# which matters: customer names must look Turkish for the MDM matching in
+# Phase 3 to be a realistic exercise rather than a toy.
+Faker==40.38.0
+
+# Excel writer, used only for the Finance source (budget / FX rates), which is
+# deliberately delivered as .xlsx to force a third file format into ingestion.
+openpyxl==3.1.5
+
+# Reads .env so machine-specific paths never get hardcoded.
+python-dotenv==1.2.3
+
+# --- Transitive, pinned for reproducibility ---
+numpy==2.5.3
+python-dateutil==2.9.0.post0
+six==1.17.0
+tzdata==2026.3
+
+# --- Phase 2+ (not needed yet, kept here as a roadmap) ---
+# pyodbc  - SQL endpoint access from local Python. Verify a wheel exists for
+#           the local Python version before committing to this; if not, we load
+#           through the OneLake file interface instead and record it in an ADR.

@@ -1,0 +1,40 @@
+# --- Python ---
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Secrets & machine-local config ---
+# .env holds machine-specific paths and (from Phase 2) Fabric connection
+# details. Only .env.example is tracked, so a new machine can be set up
+# without any secret ever entering git history.
+.env
+*.pem
+*.key
+
+# --- Generated data ---
+# The generator can emit >100 MB of CSV/JSON/XLSX. Source data is
+# reproducible from a seed, so we version the generator, not its output.
+# NOTE: `data/*` and not `data/` - git cannot re-include a file inside an
+# excluded directory, so `!data/.gitkeep` would be silently ignored.
+data/*
+!data/.gitkeep
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Power BI ---
+*.pbix.bak
+*.tmp
+
+# --- Assistant / scratch files (never part of the deliverable) ---
+CLAUDE.md
+.claude/
+scratch/
+_local_test_setup.sql

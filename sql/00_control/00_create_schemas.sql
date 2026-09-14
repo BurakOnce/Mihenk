@@ -1,0 +1,6 @@
+
+CREATE SCHEMA ctl;
+GO
+
+CREATE SCHEMA gold;
+GO

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mihenk-data-generator"
+version = "0.1.0"
+description = "Synthetic source-system data generator for the MIHENK data platform"
+requires-python = ">=3.12"
+
+# Dependencies are pinned in requirements.txt rather than here. This package is
+# never published; requirements.txt is the reproducibility contract and having
+# two lists of versions to keep in sync would be one list too many.
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Installed editable (`pip install -e .`) so that `python -m data_generator`
+# resolves from any working directory, and so imports look identical whether the
+# code runs locally or is copied into a Fabric notebook.
