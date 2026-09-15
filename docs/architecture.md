@@ -183,24 +183,3 @@ batch — so re-reading is harmless. Skipping would lose rows permanently.
 **Between duplicated work and lost data, always choose duplicated work.**
 
 ---
-
-## What is verified and what is not
-
-Everything in `src/`, `tools/` and the generated data has been run and measured.
-Nothing in `fabric/` or `sql/` has been executed against a Fabric capacity,
-because no capacity was available — the Fabric trial requires a managed work
-account and the tenant available here was refused.
-
-The seven items in [ADR-0002](adr/0002-hybrid-spark-and-tsql-architecture.md)
-are the specific behaviours that need confirming, each with a written fallback.
-Two are already resolved on paper:
-
-- **MERGE (item 3)** turns out not to matter. Writing the SCD Type 2 load both
-  ways showed that MERGE cannot close a version and open its replacement in one
-  statement, so the insert is separate regardless — which leaves MERGE doing
-  only the close, which a plain UPDATE does equally well.
-- **Cross-engine reads (item 4)** are avoided on the hot path by design. The
-  Bronze notebook writes nothing to the Warehouse; the pipeline does the logging
-  from counts the notebook returns.
-
-The rest are genuinely open and are listed as such rather than assumed.
