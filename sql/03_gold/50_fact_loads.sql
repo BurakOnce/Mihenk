@@ -5,9 +5,9 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- SELECT ... INTO #t, not CREATE TABLE #t + INSERT INTO #t (rejected on
-    -- Fabric Warehouse, see the note in 30_scd2_pattern.sql) - same fix
-    -- applies to all three #missing_* temp tables in this procedure.
+    -- CREATE TABLE #t + INSERT INTO #t değil, SELECT ... INTO #t (fabric
+    -- warehouse'ta reddediliyor, 30_scd2_pattern.sql'deki nota bak) - aynı düzeltme
+    -- bu prosedürdeki üç #missing_* geçici tablosunun hepsine uygulanıyor.
     SELECT vin, MIN(first_seen) AS first_seen
     INTO #missing_vin
     FROM (
@@ -182,11 +182,11 @@ BEGIN
         ON  mt.model_trim_code = s.model_trim_code
         AND s.contract_date >= mt.valid_from AND s.contract_date < mt.valid_to
 
-    -- transaction_flag_sk > 0 excludes the -1 "Bilinmiyor" sentinel row - it
-    -- was seeded with the same (0, 'NA', 'NA', 0, 0, 0) attribute combination
-    -- as a genuine real flag row, so without this the join finds both and
-    -- every fact matching that combination is silently duplicated. same
-    -- pattern already used elsewhere for other dimensions (dealer_sk > 0 etc).
+    -- transaction_flag_sk > 0, -1 "bilinmiyor" sentinel satırını dışarıda bırakıyor -
+    -- o satır gerçek bir bayrak satırıyla aynı (0, 'NA', 'NA', 0, 0, 0) öznitelik
+    -- kombinasyonuyla üretilmişti, bu olmadan join ikisini de buluyor ve o
+    -- kombinasyona uyan her fact sessizce ikiye katlanıyor. aynı kalıp diğer
+    -- dimension'larda zaten kullanılıyor (dealer_sk > 0 vb).
     LEFT JOIN gold.dim_transaction_flag AS tf
         ON  tf.is_campaign  = ISNULL(s.is_campaign, 0)
         AND tf.payment_type = ISNULL(s.payment_type, 'NA')
@@ -293,8 +293,8 @@ BEGIN
         AND CAST(o.checkin_ts AS DATE) <  tech.valid_to
 
     LEFT JOIN gold.dim_service_type AS st ON st.service_type_code = o.service_type_code
-    -- transaction_flag_sk > 0 - see the note on the same join in
-    -- usp_load_fact_vehicle_sale above.
+    -- transaction_flag_sk > 0 - yukarıdaki usp_load_fact_vehicle_sale'deki aynı
+    -- join'in notuna bak.
     LEFT JOIN gold.dim_transaction_flag AS tf
         ON  tf.is_campaign = 0 AND tf.payment_type = 'NA' AND tf.channel = 'NA'
         AND tf.is_used_vehicle = 0 AND tf.has_trade_in = 0
@@ -407,8 +407,8 @@ BEGIN
     SET NOCOUNT ON;
     DELETE FROM gold.fact_vehicle_inventory_daily WHERE _batch_id = @batch_id;
 
-    -- SELECT ... INTO #t, not CREATE TABLE #t + INSERT INTO #t - see the
-    -- note in 30_scd2_pattern.sql.
+    -- CREATE TABLE #t + INSERT INTO #t değil, SELECT ... INTO #t -
+    -- 30_scd2_pattern.sql'deki nota bak.
     SELECT
         v.vin, v.arrival_date,
         ISNULL(sale.delivery_date, (SELECT MAX(full_date) FROM gold.dim_date WHERE date_key > 0)) AS exit_date,

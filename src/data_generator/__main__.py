@@ -1,4 +1,4 @@
-"""command line entry point: generate the whole dataset"""
+"""komut satırı giriş noktası: tüm veri setini üret"""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 class _Timer:
-    """prints each stage as it finishes, with a running total"""
+    """her aşamayı bitince yazdırır, toplamı biriktirerek"""
 
     def __init__(self) -> None:
         self.start = time.perf_counter()
@@ -61,7 +61,7 @@ class _Timer:
         print(f"  {label:<26} {elapsed - previous:>6.1f}s   (total {elapsed:>6.1f}s)")
 
 def _prepare_output(path: Path, clean: bool) -> None:
-    """make sure we are not writing a new dataset on top of an old one"""
+    """yeni veri setini eskisinin üzerine yazmadığımızdan emin ol"""
     path.mkdir(parents=True, exist_ok=True)
     existing = [entry for entry in path.iterdir() if entry.name != ".gitkeep"]
     if not existing:

@@ -1,4 +1,4 @@
-"""generate the data dictionary and the lineage diagram from the code itself"""
+"""veri sözlüğünü ve lineage diyagramını kodun kendisinden üret"""
 
 from __future__ import annotations
 
@@ -73,14 +73,14 @@ TECHNICAL_COLUMNS = {
 }
 
 def _is_section_divider(text: str) -> bool:
-    """`--- measures ---` groups columns; it does not describe one"""
+    """`--- measures ---` sütunları gruplar; bir sütunu tarif etmez"""
     stripped = text.strip("- ").strip()
     return not stripped or set(text.strip()) <= {"-", " "} or (
         text.strip().startswith("---") and text.strip().endswith("---")
     )
 
 def _derive_description(column_name: str) -> str:
-    """fall back to the naming standard when there is no inline comment"""
+    """satır içi yorum yoksa isimlendirme standardına düş"""
     if column_name in TECHNICAL_COLUMNS:
         return TECHNICAL_COLUMNS[column_name]
     for suffix, meaning in SUFFIX_MEANINGS:
@@ -91,7 +91,7 @@ def _derive_description(column_name: str) -> str:
     return ""
 
 def parse_tables() -> dict[str, dict]:
-    """every create table in sql/, with its columns and inline comments"""
+    """sql/ altındaki her create table, sütunları ve satır içi yorumlarıyla"""
     tables: dict[str, dict] = {}
 
     for path in sorted(SQL_DIR.rglob("*.sql")):
@@ -161,7 +161,7 @@ SQL_JOIN = re.compile(r"\bJOIN\s+((?:silver|bronze|ctl|gold)\.\w+)", re.I)
 SQL_WRITE = re.compile(r"\bINSERT\s+INTO\s+(gold\.\w+)", re.I)
 
 def parse_lineage() -> dict:
-    """read what each layer actually reads and writes"""
+    """her katmanın gerçekten neyi okuyup neyi yazdığını oku"""
     edges: set[tuple[str, str]] = set()
     sources: dict[str, dict] = {}
 

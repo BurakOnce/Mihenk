@@ -1,4 +1,4 @@
-"""turkish reference data: provinces, plates, public holidays, fx rates"""
+"""türkiye referans verisi: iller, plakalar, resmî tatiller, döviz kurları"""
 
 from __future__ import annotations
 
@@ -76,7 +76,7 @@ _PLATE_SHAPES: tuple[tuple[int, int], ...] = (
 )
 
 def generate_plate(rng: random.Random, plate_code: str) -> str:
-    """a syntactically valid turkish plate for the given province"""
+    """verilen il için sözdizimsel olarak geçerli bir türk plakası"""
     letters_n, digits_n = rng.choice(_PLATE_SHAPES)
     letters = "".join(rng.choice(PLATE_LETTERS) for _ in range(letters_n))
 
@@ -108,7 +108,7 @@ _RELIGIOUS_HOLIDAYS: tuple[tuple[date, int], ...] = (
 )
 
 def build_holiday_calendar(start: date, end: date) -> dict[date, float]:
-    """map every holiday in the range to a business-activity multiplier"""
+    """aralıktaki her tatili bir iş hacmi çarpanına eşle"""
     calendar: dict[date, float] = {}
 
     for year in range(start.year, end.year + 1):
@@ -135,7 +135,7 @@ class FxRate:
     rate_to_try: float
 
 def _interpolate(anchors: dict[date, float], day: date) -> float:
-    """linear interpolation between the two anchors surrounding `day`"""
+    """`day`'i çevreleyen iki çapa arasında doğrusal ara değer"""
     points = sorted(anchors.items())
     if day <= points[0][0]:
         return points[0][1]
@@ -156,7 +156,7 @@ def build_fx_series(
     usd_anchors: dict[date, float],
     eur_anchors: dict[date, float],
 ) -> list[FxRate]:
-    """daily fx rates, business days only"""
+    """günlük kurlar, sadece iş günleri"""
     holidays = build_holiday_calendar(start, end)
     rates: list[FxRate] = []
 
@@ -196,7 +196,7 @@ SERVICE_TYPES: tuple[ServiceType, ...] = (
 SERVICE_TYPES_BY_CODE: dict[str, ServiceType] = {s.code: s for s in SERVICE_TYPES}
 
 class FxLookup:
-    """rate lookup with forward fill, because rates are not published daily"""
+    """forward fill ile kur arama, çünkü kurlar her gün yayınlanmıyor"""
 
     def __init__(self, rates: list[FxRate]) -> None:
         self._by_currency: dict[str, list[tuple[date, float]]] = {}
@@ -208,7 +208,7 @@ class FxLookup:
             series.sort()
 
     def rate(self, currency_code: str, when: date) -> float:
-        """rate to try on `when`, or the most recent published rate before it"""
+        """`when` tarihindeki try kuru, yoksa ondan önceki son yayınlanan kur"""
         if currency_code == BASE_CURRENCY:
             return 1.0
 

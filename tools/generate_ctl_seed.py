@@ -1,4 +1,4 @@
-"""generate the ctl seed sql from metadata rather than typing it twice"""
+"""ctl seed sql'ini iki kez elle yazmak yerine metadata'dan üret"""
 
 from __future__ import annotations
 
@@ -39,7 +39,7 @@ LOAD_ORDER = {
 }
 
 def q(value) -> str:
-    """t-sql string literal, with embedded quotes doubled"""
+    """t-sql metin sabiti, içerideki tırnaklar ikilenmiş"""
     if value is None:
         return "NULL"
     if isinstance(value, bool):
@@ -60,8 +60,8 @@ def generate_source_config() -> str:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
     lines = [
-        "-- generated file, do not edit by hand - see tools/generate_ctl_seed.py",
-        f"-- generated {now} from data/_manifest.json ({len(entries)} entities)",
+        "-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py",
+        f"-- {now} tarihinde data/_manifest.json'dan üretildi ({len(entries)} varlık)",
         "",
         "DELETE FROM ctl.source_config;",
         "GO",
@@ -142,7 +142,7 @@ class Rule:
     description: str = ""
 
 def _rules() -> list[Rule]:
-    """every rule, with the sql that finds its violations"""
+    """her kural, ihlallerini bulan sql ile birlikte"""
     return [
 
         Rule(
@@ -622,13 +622,13 @@ def _rules() -> list[Rule]:
     ]
 
 def generate_province_ref() -> str:
-    """turkey's 81 provinces, generated from the same table the data uses"""
+    """türkiye'nin 81 ili, verinin kullandığı aynı tablodan üretilmiş"""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     provinces = reference.PROVINCES
 
     lines = [
-        "-- generated file, do not edit by hand - see tools/generate_ctl_seed.py",
-        f"-- generated {now} from src/data_generator/reference.py ({len(provinces)} provinces)",
+        "-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py",
+        f"-- {now} tarihinde src/data_generator/reference.py'den üretildi ({len(provinces)} il)",
         "",
         "CREATE TABLE gold.ref_province",
         "(",
@@ -662,7 +662,7 @@ def generate_province_ref() -> str:
     return "\n".join(lines)
 
 def _tidy(sql: str) -> str:
-    """collapse the indented triple-quoted sql into something readable in a cell"""
+    """girintili üç tırnaklı sql'i hücrede okunabilir bir hâle sıkıştır"""
     lines = [line.rstrip() for line in sql.strip("\n").split("\n")]
     if not lines:
         return ""
@@ -688,9 +688,9 @@ def generate_dq_rules() -> str:
         )
 
     lines = [
-        "-- generated file, do not edit by hand - see tools/generate_ctl_seed.py",
-        f"-- generated {now} - {len(rules)} rules, {len(covered)} codes, "
-        f"{len(injectable)} injectable defects covered",
+        "-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py",
+        f"-- {now} tarihinde üretildi - {len(rules)} kural, {len(covered)} kod, "
+        f"{len(injectable)} enjekte edilebilir kusur kapsanıyor",
         "",
         "DELETE FROM ctl.dq_rule;",
         "GO",

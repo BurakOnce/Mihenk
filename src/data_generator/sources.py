@@ -1,4 +1,4 @@
-"""writing the six source systems out as files - and describing them.
+"""altı kaynak sistemi dosya olarak yazmak - ve onları tarif etmek.
 
 her dosyayı yazarken aynı zamanda _manifest.json'a da yazıyorum (format,
 encoding, watermark kolonu). tools/generate_ctl_seed.py bu dosyayı okuyup
@@ -28,7 +28,7 @@ from .writers import SourceSpec, SourceWriter
 _DMS_DIALECT = {"delimiter": ";", "decimal": ",", "encoding": "windows-1254"}
 
 def _by_month(rows: Iterable[dict], date_key: str) -> dict[str, list[dict]]:
-    """group transaction rows into monthly files by one of their date columns"""
+    """hareket satırlarını tarih sütunlarından birine göre aylık dosyalara grupla"""
     grouped: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
         value = str(row.get(date_key, ""))
@@ -136,7 +136,7 @@ def _write_crm(
         writer.write(spec, rows, suffix=snapshot.strftime("%Y%m%d"))
 
 def _write_workshop(writer: SourceWriter, workshop: WorkshopResult) -> None:
-    """daily drops into date-stamped folders"""
+    """tarih damgalı klasörlere günlük bırakma"""
     order_spec = writer.register(
         SourceSpec(
             "workshop", "repair_order", "csv", "incremental", ("repair_order_no",),
@@ -218,7 +218,7 @@ def _write_portal(writer: SourceWriter, portal: PortalResult) -> None:
     writer.write(spec, portal.recall_coverage, suffix="full")
 
 def _write_finance(writer: SourceWriter, finance: FinanceResult) -> None:
-    """one workbook, two sheets"""
+    """tek çalışma kitabı, iki sayfa"""
     workbook = "finance_plan"
     budget_spec = writer.register(
         SourceSpec(
@@ -239,7 +239,7 @@ def _write_finance(writer: SourceWriter, finance: FinanceResult) -> None:
 def _write_answer_keys(
     output_path: Path, customers: CustomerUniverse, injection_log: list[dict]
 ) -> None:
-    """the two files the platform must never read"""
+    """platformun asla okumaması gereken iki dosya"""
     _write_plain_csv(output_path / "_injection_log.csv", injection_log)
     _write_plain_csv(output_path / "_mdm_truth.csv", customers.truth)
 

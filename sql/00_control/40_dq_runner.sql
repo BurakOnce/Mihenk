@@ -9,11 +9,11 @@ BEGIN
     DELETE FROM ctl.dq_violation WHERE batch_id = @batch_id;
     DELETE FROM ctl.dq_result    WHERE batch_id = @batch_id;
 
-    -- fabric warehouse rejects CREATE TABLE #t + a separate INSERT INTO #t
-    -- SELECT with "references an object that is not supported in distributed
-    -- processing mode" - even for the simplest case, nothing to do with the
-    -- window function below. SELECT ... INTO #t (creating the temp table from
-    -- the query itself, ctas-style) is the form that actually works.
+    -- fabric warehouse CREATE TABLE #t + ayrı INSERT INTO #t SELECT'i "references an
+    -- object that is not supported in distributed processing mode" diye reddediyor -
+    -- en basit durumda bile, aşağıdaki window fonksiyonuyla ilgisi yok.
+    -- SELECT ... INTO #t (geçici tabloyu sorgunun kendisinden oluşturmak, ctas
+    -- tarzı) gerçekten çalışan biçim.
     SELECT
         ROW_NUMBER() OVER (ORDER BY r.rule_id) AS seq,
         r.rule_id, r.rule_code, r.target_table, r.violation_sql,

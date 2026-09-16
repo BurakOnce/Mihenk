@@ -1,11 +1,10 @@
 
--- a plain, persisted number sequence. two things NOT to reach for here on
--- fabric warehouse, both tried and both rejected with "references an object
--- that is not supported in distributed processing mode": sys.columns cross
--- joined with itself (a system catalog view can't be joined in the
--- distributed engine), and ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - an
--- order-nothing window function, even over a plain VALUES table. GENERATE_SERIES
--- is the one that actually works.
+-- düz, kalıcı bir sayı dizisi. fabric warehouse'ta burada uzak durulacak iki şey
+-- var, ikisi de denendi ve ikisi de "references an object that is not supported
+-- in distributed processing mode" ile reddedildi: sys.columns'un kendisiyle cross
+-- join'i (sistem katalog görünümü dağıtık motorda join edilemiyor) ve
+-- ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - sıralamasız bir window fonksiyonu,
+-- düz bir VALUES tablosu üzerinde bile. gerçekten çalışan GENERATE_SERIES.
 CREATE TABLE ctl.util_numbers (n INT NOT NULL);
 GO
 

@@ -1,4 +1,4 @@
-"""project-defining configuration for the mihenk source data generator"""
+"""mihenk kaynak veri üreticisinin projeyi tanımlayan yapılandırması"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 @dataclass(frozen=True)
 class Timeline:
-    """the period the simulated business has been operating"""
+    """simüle edilen işletmenin faaliyette olduğu dönem"""
 
     start: date = date(2023, 1, 1)
     end: date = date(2026, 8, 31)
@@ -25,7 +25,7 @@ class Timeline:
 
 @dataclass(frozen=True)
 class Volumes:
-    """row counts for each generated entity"""
+    """üretilen her varlık için satır sayıları"""
 
     dealers: int = 40
     employees: int = 350
@@ -45,7 +45,7 @@ class Volumes:
     recall_campaigns: int = 15
 
     def scaled(self, factor: float) -> Volumes:
-        """return the same volumes multiplied by `factor`"""
+        """aynı hacimleri `factor` ile çarpılmış olarak döndür"""
         return replace(
             self,
             **{f.name: max(1, round(getattr(self, f.name) * factor)) for f in fields(self)},
@@ -53,7 +53,7 @@ class Volumes:
 
 @dataclass(frozen=True)
 class DirtyRatios:
-    """share of rows deliberately corrupted, per defect type"""
+    """kusur tipi başına bilerek bozulan satır oranı"""
 
     invalid_vin_format: float = 0.006
 
@@ -83,7 +83,7 @@ class DirtyRatios:
 
 @dataclass(frozen=True)
 class Economics:
-    """price and currency behaviour over the timeline"""
+    """zaman çizgisi boyunca fiyat ve para birimi davranışı"""
 
     annual_inflation: dict[int, float] = None
 
@@ -131,7 +131,7 @@ class Economics:
 
 @dataclass(frozen=True)
 class Seasonality:
-    """monthly demand multipliers, january through december"""
+    """aylık talep çarpanları, ocaktan aralığa"""
 
     vehicle_sales: tuple[float, ...] = (
         0.72,
@@ -171,7 +171,7 @@ class Seasonality:
 
 @dataclass(frozen=True)
 class Settings:
-    """everything the generator needs, assembled in one object"""
+    """üreticinin ihtiyaç duyduğu her şey, tek nesnede toplanmış"""
 
     seed: int
     output_path: Path
@@ -203,7 +203,7 @@ class Settings:
 
     @classmethod
     def from_env(cls, scale: float = 1.0) -> Settings:
-        """build settings from `.env`, falling back to documented defaults"""
+        """ayarları `.env`'den kur, yoksa belgelenmiş varsayılanlara düş"""
         load_dotenv()
 
         seed = int(os.getenv("MIHENK_SEED", "20260101"))
@@ -227,7 +227,7 @@ class Settings:
         )
 
     def describe(self) -> str:
-        """one-screen summary, printed at the start of every run"""
+        """tek ekranlık özet, her çalıştırmanın başında yazdırılır"""
         v = self.volumes
         return (
             f"MIHENK data generator\n"

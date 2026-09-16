@@ -1,7 +1,7 @@
-"""prove that the same seed produces byte-identical output.
+"""aynı seed'in byte düzeyinde aynı çıktıyı ürettiğini kanıtla.
 
-claude yardımıyla yazıldı - bu script sayesinde xlsx dosyasının tekrar
-üretilebilir olmadığını fark ettim (zip içindeki zaman damgası yüzünden).
+xlsx tekrar üretilebilirlik sorununu bu script ortaya çıkardı: zip kabı ve
+openpyxl'in docProps'u sabitlenmezse o anki saati taşıyor.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 def digest_tree(root: Path) -> dict[str, str]:
-    """sha-256 per file, keyed by relative path"""
+    """dosya başına sha-256, göreli yolla anahtarlanmış"""
     return {
         path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in sorted(root.rglob("*"))
@@ -25,7 +25,7 @@ def digest_tree(root: Path) -> dict[str, str]:
     }
 
 def tree_digest(files: dict[str, str]) -> str:
-    """one hash for the whole tree, covering names as well as contents"""
+    """tüm ağaç için tek hash, içerikle birlikte isimleri de kapsıyor"""
     joined = "".join(f"{name}:{files[name]}\n" for name in sorted(files))
     return hashlib.sha256(joined.encode()).hexdigest()
 

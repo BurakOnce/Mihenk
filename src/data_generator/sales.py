@@ -1,4 +1,4 @@
-"""vehicle sales: contracts, trade-ins, and vins changing hands"""
+"""araç satışları: sözleşmeler, takaslar ve el değiştiren vin'ler"""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ class SalesResult:
 def _build_salesperson_index(
     master: MasterData, snapshot_dates: list[date]
 ) -> dict[tuple[str, int, int], list[str]]:
-    """sales advisors per dealer per month"""
+    """bayi ve ay başına satış danışmanları"""
     index: dict[tuple[str, int, int], list[str]] = defaultdict(list)
     for snapshot in snapshot_dates:
         for employee in master.employees:
@@ -53,7 +53,7 @@ def _build_salesperson_index(
 def _build_customer_index(
     customers: CustomerUniverse,
 ) -> tuple[dict[str, list[tuple[date, str]]], list[tuple[date, str]]]:
-    """customers by home province, sorted by the date they were acquired"""
+    """ikamet iline göre müşteriler, kazanıldıkları tarihe göre sıralı"""
     by_province: dict[str, list[tuple[date, str]]] = defaultdict(list)
     everyone: list[tuple[date, str]] = []
 
@@ -74,7 +74,7 @@ def _pick_customer(
     province_code: str,
     when: date,
 ) -> str | None:
-    """an existing customer, preferring one local to the dealer"""
+    """mevcut bir müşteri, bayiye yakın olan tercih edilir"""
     pools = [by_province.get(province_code, []), everyone]
     if rng.random() > 0.70:
         pools.reverse()
@@ -92,7 +92,7 @@ def _discount_rate(
     is_fleet: bool,
     days_in_stock: int,
 ) -> float:
-    """how much comes off list, and why"""
+    """liste fiyatından ne kadar düşülüyor ve neden"""
     rate = rng.uniform(0.020, 0.090)
     if is_campaign:
         rate += rng.uniform(0.030, 0.080)
@@ -109,7 +109,7 @@ def _trade_in_value(
     when: date,
     settings: Settings,
 ) -> float:
-    """what the dealer pays for the car being traded in, in try"""
+    """bayinin takasa alınan araca ödediği tutar, try cinsinden"""
     trim = master.trims_by_key.get(vehicle.model_trim_code)
     state = trim.state_at(when) if trim else None
     current_list = float(state["list_price_try"]) if state else vehicle.list_price_at_arrival_try
@@ -123,7 +123,7 @@ def _trade_in_value(
     return round(market_value * rng.uniform(0.86, 0.97), 2)
 
 def _next_working_day(when: date, holidays: dict[date, float]) -> date:
-    """push a date off a weekend or public holiday onto the next working day"""
+    """hafta sonu ya da tatile denk gelen tarihi sonraki iş gününe it"""
     for _ in range(10):
         if when.weekday() < 5 and holidays.get(when, 1.0) >= 0.2:
             return when
@@ -242,7 +242,7 @@ def generate_sales(
     return result
 
 def _pick_from_forecourt(rng: random.Random, available: list[Vehicle]) -> Vehicle:
-    """take a car off the forecourt, biased towards the oldest"""
+    """stoktan bir araç al, en eskiye doğru ağırlıklı"""
     if rng.random() < 0.60:
         return available.pop(0)
     return available.pop(rng.randrange(min(len(available), 40)))
@@ -379,7 +379,7 @@ def _used_contract(
     dealer_code, customer_id, is_corporate, contract_date,
     waiting, dealer_used_stock, owned, contract_seq,
 ) -> dict:
-    """resell a traded-in car. this is the second owner of that vin"""
+    """takasa alınan aracı yeniden sat. bu, o vin'in ikinci sahibi"""
 
     entry = waiting[0]
     dealer_used_stock.remove(entry)

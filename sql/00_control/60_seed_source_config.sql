@@ -1,5 +1,5 @@
--- generated file, do not edit by hand - see tools/generate_ctl_seed.py
--- generated 2026-09-13 21:37:24 from data/_manifest.json (17 entities)
+-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py
+-- 2026-09-13 21:37:24 tarihinde data/_manifest.json'dan üretildi (17 varlık)
 
 DELETE FROM ctl.source_config;
 GO

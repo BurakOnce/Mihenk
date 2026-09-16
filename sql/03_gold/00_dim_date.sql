@@ -65,16 +65,16 @@ BEGIN
 
     DELETE FROM gold.ref_public_holiday;
 
-    -- a CTE's scope is the one statement it's attached to - it cannot be
-    -- reused across two separate INSERTs. a temp table can, which is why
-    -- this is #years and not a CTE: the fixed-holiday insert below and the
-    -- half-day insert after it both read from it.
+    -- bir cte'nin kapsamı bağlı olduğu tek ifadedir - iki ayrı INSERT'te yeniden
+    -- kullanılamaz. geçici tablo kullanılabilir, bu yüzden bu bir cte değil #years:
+    -- aşağıdaki sabit tatil insert'i ve ondan sonraki yarım gün insert'i ikisi de
+    -- bundan okuyor.
     --
-    -- CREATE TABLE #years + a separate INSERT INTO #years SELECT fails on
-    -- Fabric Warehouse ("not supported in distributed processing mode"),
-    -- confirmed down to the simplest possible case - it isn't about this
-    -- query's complexity. SELECT ... INTO #years (creating the temp table
-    -- from the query itself) is the form Fabric actually accepts.
+    -- CREATE TABLE #years + ayrı INSERT INTO #years SELECT fabric warehouse'ta
+    -- hata veriyor ("not supported in distributed processing mode"), en basit
+    -- durumda bile doğrulandı - bu sorgunun karmaşıklığıyla ilgili değil.
+    -- SELECT ... INTO #years (geçici tabloyu sorgunun kendisinden oluşturmak)
+    -- fabric'in gerçekten kabul ettiği biçim.
     SELECT DISTINCT YEAR(d.full_date) AS y
     INTO #years
     FROM (SELECT DATEADD(DAY, n.n, @from_date) AS full_date
@@ -131,21 +131,21 @@ BEGIN
     ) AS r (holiday_date, holiday_name, is_half_day)
     WHERE CAST(r.holiday_date AS DATE) BETWEEN @from_date AND @to_date;
 
-    -- a fixed holiday and a religious one can land on the same date - 23 April
-    -- 2023 is both Ulusal Egemenlik ve Çocuk Bayramı and the third day of
-    -- Ramazan Bayramı that year. Left alone this puts two rows in
-    -- ref_public_holiday for one date, and the join below would then try to
-    -- insert that date_key into dim_date twice.
+    -- sabit bir tatil ile dinî bir tatil aynı tarihe denk gelebilir - 23 nisan
+    -- 2023 hem ulusal egemenlik ve çocuk bayramı hem de o yıl ramazan
+    -- bayramı'nın üçüncü günü. olduğu gibi bırakılırsa ref_public_holiday'e bir
+    -- tarih için iki satır girer ve aşağıdaki join o date_key'i dim_date'e iki
+    -- kez eklemeye çalışır.
     --
-    -- found by running this against a real, constraint-enforcing SQL Server -
-    -- Fabric Warehouse would have accepted the duplicate silently (NOT
-    -- ENFORCED) and quietly double-counted every fact joined to that day.
-    -- exactly the failure mode ADR-0002 warns about.
+    -- bunu gerçek, kısıtları zorlayan bir sql server'da çalıştırarak buldum -
+    -- fabric warehouse mükerreri sessizce kabul eder (NOT ENFORCED) ve o güne
+    -- bağlanan her fact'i sessizce iki kez sayardı. tam olarak adr-0002'nin
+    -- uyardığı hata biçimi.
     --
-    -- the "full day beats half day" tie-break is expressed with GROUP BY +
-    -- MAX/MIN rather than ROW_NUMBER()+DELETE, and staged with SELECT...INTO
-    -- rather than CREATE TABLE + INSERT INTO - see the #years note above,
-    -- the same temp-table restriction applies here.
+    -- "tam gün yarım günü yener" önceliği ROW_NUMBER()+DELETE yerine GROUP BY +
+    -- MAX/MIN ile ifade ediliyor ve CREATE TABLE + INSERT INTO yerine SELECT...INTO
+    -- ile hazırlanıyor - yukarıdaki #years notuna bak, aynı geçici tablo kısıtı
+    -- burada da geçerli.
     SELECT
         holiday_date,
         CASE WHEN MAX(CASE WHEN is_half_day = 0 THEN 1 ELSE 0 END) = 1

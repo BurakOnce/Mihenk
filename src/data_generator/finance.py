@@ -1,4 +1,4 @@
-"""finance: dealer targets and the published exchange rate table"""
+"""finans: bayi hedefleri ve yayınlanan döviz kuru tablosu"""
 
 from __future__ import annotations
 

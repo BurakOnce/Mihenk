@@ -1,4 +1,4 @@
-"""spare part procurement: purchase orders driven by what the workshops used"""
+"""yedek parça tedariki: atölyelerin kullandığına göre oluşan satın alma siparişleri"""
 
 from __future__ import annotations
 
@@ -176,7 +176,7 @@ def generate_part_purchases(
     return result
 
 def _order_currency(rng: random.Random, is_import: bool) -> str:
-    """imported parts are invoiced in eur or usd; domestic ones in try"""
+    """ithal parçalar eur veya usd ile faturalanır; yerli olanlar try ile"""
     if not is_import:
         return ref.BASE_CURRENCY
     return rng.choices(("EUR", "USD", ref.BASE_CURRENCY), weights=(0.55, 0.30, 0.15), k=1)[0]

@@ -1,4 +1,4 @@
-"""randomness with a spine: reproducible, independent, and shaped like a business"""
+"""omurgalı rastgelelik: tekrar üretilebilir, bağımsız ve bir işletme gibi şekillenmiş"""
 
 from __future__ import annotations
 
@@ -13,24 +13,24 @@ from datetime import date, timedelta
 # verir. bunu engine_no üretirken hash() kullanıp bulmuştum, veri hiç
 # tekrar üretilemiyordu.
 def sub_seed(master_seed: int, name: str) -> int:
-    """derive a stable child seed from the master seed and a stream name"""
+    """ana seed ve akış adından kararlı bir alt seed türet"""
     digest = hashlib.blake2b(
         f"{master_seed}:{name}".encode("utf-8"), digest_size=8
     ).digest()
     return int.from_bytes(digest, "big")
 
 def stream(master_seed: int, name: str) -> random.Random:
-    """an independent random stream for one generator module"""
+    """tek bir üretici modülü için bağımsız rastgele akış"""
     return random.Random(sub_seed(master_seed, name))
 
 def weighted_choice(rng: random.Random, items: Sequence, weights: Sequence[float]):
-    """pick one item with probability proportional to its weight"""
+    """ağırlığıyla orantılı olasılıkla tek öğe seç"""
     return rng.choices(items, weights=weights, k=1)[0]
 
 def weighted_sample(
     rng: random.Random, items: Sequence, weights: Sequence[float], k: int
 ) -> list:
-    """pick `k` distinct items with probability proportional to weight"""
+    """ağırlıkla orantılı olasılıkla `k` farklı öğe seç"""
     pool = list(items)
     pool_weights = list(weights)
     picked: list = []
@@ -41,21 +41,21 @@ def weighted_sample(
     return picked
 
 def performance_index(rng: random.Random) -> float:
-    """a multiplier describing how well one dealer or salesperson performs"""
+    """bir bayinin ya da satışçının ne kadar iyi performans gösterdiğini anlatan çarpan"""
     return clamp(rng.lognormvariate(0.0, 0.38), 0.35, 2.80)
 
 def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
 def jitter(rng: random.Random, value: float, pct: float) -> float:
-    """vary a value by +/- `pct`, e.g. jitter(rng, 1000, 0.1) -> 900..1100"""
+    """bir değeri +/- `pct` kadar oynat, ör. jitter(rng, 1000, 0.1) -> 900..1100"""
     return value * (1.0 + rng.uniform(-pct, pct))
 
 _WEEKDAY_SALES = (1.00, 1.00, 1.00, 1.02, 1.10, 1.25, 0.15)
 _WEEKDAY_SERVICE = (1.10, 1.08, 1.05, 1.05, 1.05, 0.55, 0.05)
 
 class DateSampler:
-    """samples dates across a timeline with a realistic demand shape"""
+    """gerçekçi bir talep şekliyle zaman çizgisinden tarih örnekler"""
 
     def __init__(
         self,
@@ -100,7 +100,7 @@ class DateSampler:
 
     @staticmethod
     def _tax_event_factor(day: date, tax_change_dates: Sequence[date]) -> float:
-        """pull-forward spike before a tax change, slump after it"""
+        """vergi değişikliğinden önce öne çekilme zirvesi, sonra düşüş"""
         factor = 1.0
         for change in tax_change_dates:
             delta = (day - change).days
@@ -121,7 +121,7 @@ class DateSampler:
         return [self.sample() for _ in range(k)]
 
     def weight_on(self, day: date) -> float:
-        """relative weight of a single day. used for reporting and testing"""
+        """tek bir günün göreli ağırlığı. raporlama ve test için kullanılır"""
         index = (day - self._start).days
         if not 0 <= index < len(self._cumulative):
             return 0.0
@@ -129,13 +129,13 @@ class DateSampler:
         return self._cumulative[index] - previous
 
 def random_date_between(rng: random.Random, start: date, end: date) -> date:
-    """uniform date in a closed interval. for spans where shape does not matter"""
+    """kapalı aralıkta düzgün dağılımlı tarih. şeklin önemsiz olduğu aralıklar için"""
     if end < start:
         start, end = end, start
     return start + timedelta(days=rng.randint(0, (end - start).days))
 
 def business_days_after(start: date, days: int, holidays: dict[date, float]) -> date:
-    """advance `days` working days, skipping weekends and public holidays"""
+    """`days` iş günü ilerle, hafta sonu ve resmî tatilleri atlayarak"""
     current = start
     remaining = days
     while remaining > 0:

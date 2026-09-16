@@ -1,4 +1,4 @@
-"""file writers, one per source-system quirk - and the ingestion manifest.
+"""dosya yazıcıları, her kaynak sistemin kendi tuhaflığına göre - ve ingestion manifest'i.
 
 xlsx yazımında bir tekrar-üretilebilirlik hatası buldum: .xlsx bir zip, ve zip
 her girdiye o anki zamanı yazıyor. aynı seed'le iki kere çalıştırınca sadece bu
@@ -20,7 +20,7 @@ LoadType = Literal["full", "incremental"]
 
 @dataclass
 class SourceSpec:
-    """everything bronze needs to know in order to read one source entity"""
+    """bronze'un bir kaynak varlığı okumak için bilmesi gereken her şey"""
 
     source_system: str
     entity: str
@@ -46,19 +46,19 @@ class SourceSpec:
 
     @property
     def target_table(self) -> str:
-        """bronze table this entity lands in"""
+        """bu varlığın indiği bronze tablosu"""
         return f"bronze.{self.source_system}_{self.entity}"
 
     @property
     def file_pattern(self) -> str:
-        """glob the pipeline uses to find this entity's files"""
+        """pipeline'ın bu varlığın dosyalarını bulmak için kullandığı glob"""
         stem = self.file_stem or self.entity
         if self.date_partitioned:
             return f"{self.source_system}/{self.entity}/*/{stem}_*.{self.file_format}"
         return f"{self.source_system}/{stem}_*.{self.file_format}"
 
 class SourceWriter:
-    """writes source files and records what it wrote"""
+    """kaynak dosyaları yazar ve ne yazdığını kaydeder"""
 
     def __init__(self, output_path: Path) -> None:
         self.output_path = output_path
@@ -77,7 +77,7 @@ class SourceWriter:
         suffix: str,
         sheet_name: str | None = None,
     ) -> Path:
-        """write one file for `spec`"""
+        """`spec` için tek dosya yaz"""
         rows = list(rows)
         frame = pd.DataFrame(rows)
 
@@ -151,7 +151,7 @@ class SourceWriter:
 
     @staticmethod
     def _normalise_zip_timestamps(path: Path) -> None:
-        """rewrite an .xlsx so two runs produce identical bytes"""
+        """bir .xlsx'i iki çalıştırma aynı byte'ları üretecek şekilde yeniden yaz"""
         import re
         import zipfile
 
@@ -178,7 +178,7 @@ class SourceWriter:
                 target.writestr(stamped, data)
 
     def write_manifest(self) -> Path:
-        """emit `_manifest.json`, the seed for `ctl.source_config`"""
+        """`ctl.source_config`'in tohumu olan `_manifest.json`'ı yaz"""
         entries = []
         for key in sorted(self.specs):
             spec = self.specs[key]

@@ -1,4 +1,4 @@
-"""turn readable .py notebook sources into .ipynb files for fabric"""
+"""okunabilir .py notebook kaynaklarını fabric için .ipynb dosyalarına çevir"""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ CELL_MARKER = re.compile(r"^#\s*%%(?P<rest>.*)$")
 MAGIC_COMMENT = re.compile(r"^(?P<indent>\s*)#\s?(?P<magic>%{1,2}[a-zA-Z].*)$")
 
 def _parse_cells(source: str) -> list[tuple[str, list[str], list[str]]]:
-    """split a percent-format file into (cell_type, tags, lines)"""
+    """yüzde formatındaki dosyayı (cell_type, tags, lines) parçalarına ayır"""
     cells: list[tuple[str, list[str], list[str]]] = []
     cell_type, tags, buffer = "code", [], []
 
@@ -41,7 +41,7 @@ def _parse_cells(source: str) -> list[tuple[str, list[str], list[str]]]:
     return cells
 
 def _strip_markdown_comments(lines: list[str]) -> list[str]:
-    """markdown cells are written as comments; take the comment marker off"""
+    """markdown hücreleri yorum olarak yazılıyor; yorum işaretini kaldır"""
     out = []
     for line in lines:
         stripped = line.lstrip()
@@ -54,8 +54,8 @@ def _strip_markdown_comments(lines: list[str]) -> list[str]:
     return out
 
 def _unescape_magics(lines: list[str]) -> list[str]:
-    """a magic like %run isn't valid python, so the .py source comments it
-    out (# %run x) to stay lint-clean; undo that so fabric actually runs it"""
+    """%run gibi bir magic geçerli python değil, o yüzden .py kaynağı lint temiz
+    kalsın diye onu yoruma alıyor (# %run x); bunu geri al ki fabric gerçekten çalıştırsın"""
     out = []
     for line in lines:
         match = MAGIC_COMMENT.match(line)
@@ -63,7 +63,7 @@ def _unescape_magics(lines: list[str]) -> list[str]:
     return out
 
 def _to_source(lines: list[str]) -> list[str]:
-    """nbformat stores source as a list of lines, each keeping its newline"""
+    """nbformat kaynağı satır listesi olarak tutar, her satır kendi newline'ını korur"""
     while lines and not lines[0].strip():
         lines.pop(0)
     while lines and not lines[-1].strip():

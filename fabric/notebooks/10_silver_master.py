@@ -194,8 +194,8 @@ for spec in SPECS:
     )
 
 # %%
-# each table z-orders on the column it's actually looked up by - the header
-# carries vin, the lines only carry the repair order they belong to.
+# her tablo gerçekten arandığı sütuna göre z-order alıyor - başlıkta vin var,
+# satırlarda sadece ait oldukları iş emri numarası var.
 OPTIMIZE_KEYS = {
     "bronze.workshop_repair_order": "vin",
     "bronze.workshop_repair_order_line": "repair_order_no",

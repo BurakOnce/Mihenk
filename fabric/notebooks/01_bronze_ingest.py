@@ -65,7 +65,7 @@ print(f"watermark  : {config['watermark_column']} > {config['watermark_value']}"
 
 # %%
 def resolve_paths(config: dict) -> list[str]:
-    """return the paths this run should read"""
+    """bu çalıştırmanın okuması gereken yolları döndür"""
     pattern = config["file_pattern"]
 
     if not config["is_date_partitioned"]:
@@ -118,7 +118,7 @@ def read_json(paths: list[str], multiline: bool) -> DataFrame:
 
 # %%
 def read_xlsx(config: dict) -> DataFrame:
-    """excel via pandas, then handed to spark"""
+    """excel pandas ile okunur, sonra spark'a verilir"""
     import glob as _glob
 
     import pandas as pd

@@ -1,4 +1,4 @@
-"""master data: dealers, employees, model/trim catalogue, parts, suppliers"""
+"""ana veri: bayiler, personel, model/donanım kataloğu, parçalar, tedarikçiler"""
 
 from __future__ import annotations
 
@@ -102,7 +102,7 @@ _SUPPLIER_COUNTRIES = (
 
 @dataclass
 class MasterData:
-    """generated master entities, plus simulation-only side tables"""
+    """üretilen ana veri varlıkları, artı sadece simülasyonda kullanılan yan tablolar"""
 
     dealers: list[Versioned] = field(default_factory=list)
     employees: list[Versioned] = field(default_factory=list)
@@ -122,7 +122,7 @@ class MasterData:
     parts_by_key: dict[str, Versioned] = field(default_factory=dict)
 
     def dealer_codes(self, *, selling: bool = False, servicing: bool = False) -> list[str]:
-        """dealer codes filtered by what the dealer is licensed to do"""
+        """bayinin yetkili olduğu işe göre süzülmüş bayi kodları"""
         codes: list[str] = []
         for dealer in self.dealers:
             dealer_type = dealer.base["dealer_type"]
@@ -134,7 +134,7 @@ class MasterData:
         return codes
 
 def inflate(base_price: float, from_date: date, to_date: date, annual: dict[int, float]) -> float:
-    """carry a price forward through the configured annual inflation"""
+    """bir fiyatı yapılandırılmış yıllık enflasyonla ileri taşı"""
     if to_date <= from_date:
         return base_price
 
@@ -149,7 +149,7 @@ def inflate(base_price: float, from_date: date, to_date: date, annual: dict[int,
     return price
 
 def generate_suppliers(settings: Settings, faker: Faker) -> tuple[list[Versioned], dict[str, float]]:
-    """part suppliers. type 1 in gold - history is not tracked for these"""
+    """parça tedarikçileri. gold'da type 1 - bunlar için geçmiş tutulmuyor"""
     rng = stream(settings.seed, "suppliers")
     faker.seed_instance(rng.randint(0, 2**31))
 
@@ -184,7 +184,7 @@ def generate_suppliers(settings: Settings, faker: Faker) -> tuple[list[Versioned
     return suppliers, reliability
 
 def generate_dealers(settings: Settings) -> tuple[list[Versioned], dict[str, float]]:
-    """the franchised dealer network"""
+    """yetkili bayi ağı"""
     rng = stream(settings.seed, "dealers")
     count = settings.volumes.dealers
 
@@ -249,7 +249,7 @@ def generate_dealers(settings: Settings) -> tuple[list[Versioned], dict[str, flo
     return dealers, performance
 
 def _apply_dealer_changes(rng: random.Random, dealers: list[Versioned], settings: Settings) -> None:
-    """attribute changes that scd type 2 will turn into dimension versions"""
+    """scd type 2'nin dimension versiyonlarına çevireceği öznitelik değişiklikleri"""
     regions = sorted({p.region for p in ref.PROVINCES})
 
     for dealer in dealers:
@@ -279,7 +279,7 @@ def _apply_dealer_changes(rng: random.Random, dealers: list[Versioned], settings
 def generate_employees(
     settings: Settings, faker: Faker, dealers: list[Versioned]
 ) -> list[Versioned]:
-    """sales advisors, service advisors, technicians and managers"""
+    """satış danışmanları, servis danışmanları, teknisyenler ve müdürler"""
     rng = stream(settings.seed, "employees")
     faker.seed_instance(rng.randint(0, 2**31))
 
@@ -350,7 +350,7 @@ def _apply_employee_changes(
             employee.retired_on = leaving
 
 def generate_model_trims(settings: Settings) -> tuple[list[Versioned], dict[str, str], dict[str, float]]:
-    """the product catalogue: every model crossed with every trim level"""
+    """ürün kataloğu: her model her donanım seviyesiyle çaprazlanmış"""
     rng = stream(settings.seed, "model_trims")
     trims: list[Versioned] = []
     vds_by_trim: dict[str, str] = {}
@@ -396,7 +396,7 @@ def generate_model_trims(settings: Settings) -> tuple[list[Versioned], dict[str,
     return trims, vds_by_trim, base_price_by_trim
 
 def _apply_price_changes(rng: random.Random, trims: list[Versioned], settings: Settings) -> None:
-    """two to five list price revisions per trim, plus the occasional facelift"""
+    """donanım başına iki ila beş liste fiyatı güncellemesi, artı ara sıra makyaj"""
     annual = settings.economics.annual_inflation
 
     for trim in trims:
@@ -425,7 +425,7 @@ def _apply_price_changes(rng: random.Random, trims: list[Versioned], settings: S
 def generate_parts(
     settings: Settings, suppliers: list[Versioned]
 ) -> list[Versioned]:
-    """the spare part catalogue"""
+    """yedek parça kataloğu"""
     rng = stream(settings.seed, "parts")
     supplier_keys = [s.key for s in suppliers]
     group_codes = [g[0] for g in PART_GROUPS]
@@ -494,7 +494,7 @@ def _apply_part_changes(
                 part.add_change(when, supplier_id=rng.choice(alternatives))
 
 def generate_master_data(settings: Settings) -> MasterData:
-    """generate every master entity, in dependency order"""
+    """her ana veri varlığını bağımlılık sırasıyla üret"""
     faker = Faker("tr_TR")
 
     suppliers, reliability = generate_suppliers(settings, faker)

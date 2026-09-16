@@ -1,18 +1,18 @@
-"""build a single sql file for testing sql/00_control + sql/03_gold on a real,
-local sql server instance (ssms / sql express) instead of fabric warehouse.
+"""sql/00_control + sql/03_gold'u fabric warehouse yerine gerçek, yerel bir sql
+server örneğinde (ssms / sql express) test etmek için tek bir sql dosyası kur.
 
-only difference from the real files: "not enforced" is stripped from every
-primary key, because that's a fabric/synapse-only constraint option - real
-sql server doesn't parse it at all. everything else is untouched, so this is
-testing the actual ddl we ship, not a rewrite of it.
+gerçek dosyalardan tek farkı: her primary key'den "not enforced" çıkarılıyor,
+çünkü bu sadece fabric/synapse'e özgü bir kısıt seçeneği - gerçek sql server
+bunu hiç ayrıştıramıyor. geri kalan her şey olduğu gibi, yani teslim ettiğimiz
+ddl'in kendisi test ediliyor, yeniden yazılmış hâli değil.
 
-known local-only gap: 90_util_numbers.sql uses GENERATE_SERIES, which needs
-sql server 2022+. an older local instance fails that one batch and
-ctl.util_numbers stays empty - gold.usp_populate_dim_date then still "succeeds"
-but populates only its -1 unknown-member row. this only affects local testing;
-GENERATE_SERIES is confirmed working on the real fabric warehouse.
+bilinen yerel eksik: 90_util_numbers.sql GENERATE_SERIES kullanıyor, bu da sql
+server 2022+ istiyor. daha eski bir yerel örnek o tek batch'te hata verir ve
+ctl.util_numbers boş kalır - gold.usp_populate_dim_date yine "başarılı" olur ama
+sadece -1 bilinmiyor üyesini doldurur. bu sadece yerel testi etkiler;
+GENERATE_SERIES gerçek fabric warehouse'ta çalıştığı doğrulandı.
 
-not committed to git - regenerate any time with:
+git'e girmiyor - istediğin zaman şununla yeniden üret:
     python tools/build_local_test_sql.py
 """
 from __future__ import annotations
@@ -23,10 +23,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "tools" / "_local_test_setup.sql"
 
-# order matters: ctl schema/tables before gold, and within each folder the
-# existing NN_ prefixes are already the right order. seed files are skipped -
-# they insert into ctl.source_config / ctl.dq_rule referencing tables that
-# only make sense once data/ has been generated; run them separately if wanted.
+# sıra önemli: önce ctl şema/tabloları sonra gold, her klasörün içinde de mevcut
+# NN_ önekleri zaten doğru sırayı veriyor. seed dosyaları atlanıyor - onlar
+# ctl.source_config / ctl.dq_rule'a, ancak data/ üretildikten sonra anlamlı olan
+# tablolara referans vererek insert atıyor; istenirse ayrıca çalıştırılır.
 FILES = [
     "sql/00_control/00_create_schemas.sql",
     "sql/00_control/10_source_config.sql",

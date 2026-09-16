@@ -1,4 +1,4 @@
-"""attribute change history for master data - so scd type 2 has work to do.
+"""ana veri için öznitelik değişim geçmişi - scd type 2'nin işi olsun diye.
 
 tek snapshot alsaydım scd2'nin takip edecek hiçbir şeyi kalmazdı, o yüzden her
 entity için tarihli bir değişim listesi tutuyorum.
@@ -12,7 +12,7 @@ from typing import Any, Iterator
 
 @dataclass
 class Versioned:
-    """one master-data entity and its attribute history"""
+    """tek bir ana veri varlığı ve öznitelik geçmişi"""
 
     key: str
     created_on: date
@@ -22,7 +22,7 @@ class Versioned:
     retired_on: date | None = None
 
     def add_change(self, when: date, **attributes: Any) -> None:
-        """record an attribute change. changes are kept in date order"""
+        """bir öznitelik değişikliği kaydet. değişiklikler tarih sırasında tutulur"""
         if when < self.created_on:
             raise ValueError(f"{self.key}: change dated before creation")
         self.changes.append((when, attributes))
@@ -32,7 +32,7 @@ class Versioned:
         return self.created_on <= when
 
     def state_at(self, when: date) -> dict[str, Any] | None:
-        """full attribute state as of `when`, or none if not yet created"""
+        """`when` itibarıyla tam öznitelik durumu, henüz oluşmadıysa none"""
         if not self.exists_at(when):
             return None
 
@@ -48,7 +48,7 @@ class Versioned:
         return state
 
     def last_modified_at(self, when: date) -> date | None:
-        """date of the most recent change on or before `when`"""
+        """`when` ve öncesindeki en son değişikliğin tarihi"""
         if not self.exists_at(when):
             return None
 
@@ -64,7 +64,7 @@ class Versioned:
         return latest
 
 def month_starts(start: date, end: date) -> list[date]:
-    """first of every month in the range, plus `start` itself if it is not one"""
+    """aralıktaki her ayın ilk günü, artı ayın ilki değilse `start`'ın kendisi"""
     dates: list[date] = []
     if start.day != 1:
         dates.append(start)
@@ -89,7 +89,7 @@ def full_snapshots(
     *,
     last_modified_field: str = "last_modified_ts",
 ) -> Iterator[tuple[date, list[dict[str, Any]]]]:
-    """every entity that exists, at every snapshot date"""
+    """var olan her varlık, her snapshot tarihinde"""
     for snapshot_date in snapshot_dates:
         rows: list[dict[str, Any]] = []
         for entity in entities:
@@ -108,7 +108,7 @@ def incremental_extracts(
     *,
     last_modified_field: str = "last_modified_ts",
 ) -> Iterator[tuple[date, list[dict[str, Any]]]]:
-    """only rows created or changed since the previous extract"""
+    """sadece önceki çıkarımdan beri oluşan ya da değişen satırlar"""
     previous: date | None = None
 
     for snapshot_date in snapshot_dates:
@@ -138,7 +138,7 @@ def spread_changes(
     *,
     min_gap_days: int = 30,
 ) -> list[date]:
-    """`count` change dates in a range, never two closer than `min_gap_days`"""
+    """aralıkta `count` adet değişim tarihi, hiçbiri `min_gap_days`'den yakın değil"""
     if end <= start or count <= 0:
         return []
 

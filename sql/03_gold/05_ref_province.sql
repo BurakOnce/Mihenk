@@ -1,5 +1,5 @@
--- generated file, do not edit by hand - see tools/generate_ctl_seed.py
--- generated 2026-09-13 21:37:24 from src/data_generator/reference.py (81 provinces)
+-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py
+-- 2026-09-13 21:37:24 tarihinde src/data_generator/reference.py'den üretildi (81 il)
 
 CREATE TABLE gold.ref_province
 (
@@ -96,8 +96,8 @@ SELECT * FROM (VALUES
 ) AS v (province_code, province_name, region, population_m);
 GO
 
--- The Unknown member, so a customer with an unparseable city code still
--- resolves to a region rather than dropping out of every regional visual.
+-- bilinmiyor üyesi: il kodu çözülemeyen bir müşteri her bölgesel görselden
+-- düşmek yerine yine de bir bölgeye bağlansın diye.
 INSERT INTO gold.ref_province (province_code, province_name, region, population_m)
 VALUES ('-1', 'Bilinmiyor', 'Bilinmiyor', NULL);
 GO

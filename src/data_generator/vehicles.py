@@ -1,4 +1,4 @@
-"""the vehicle population: 35,000 vins and the state each one carries forward"""
+"""araç popülasyonu: 35.000 vin ve her birinin ileriye taşıdığı durum"""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ _DEALER_MARGIN = (0.070, 0.135)
 
 @dataclass
 class Vehicle:
-    """one vehicle: its identity, and the state it carries through the timeline"""
+    """tek araç: kimliği ve zaman çizgisi boyunca taşıdığı durum"""
 
     vin: str
     model_trim_code: str
@@ -62,20 +62,20 @@ class Vehicle:
     record: Versioned | None = None
 
     def warranty_expiry_date(self) -> date | None:
-        """calendar end of the warranty, measured from first registration"""
+        """garantinin takvim sonu, ilk tescilden itibaren ölçülür"""
         if self.first_sale_date is None:
             return None
         return self.first_sale_date + timedelta(days=round(self.warranty_months * 30.44))
 
     def is_under_warranty(self, when: date, odometer_km: int) -> bool:
-        """warranty is the earlier of the time limit and the distance limit"""
+        """garanti, süre sınırı ile mesafe sınırından hangisi önce gelirse odur"""
         expiry = self.warranty_expiry_date()
         if expiry is None:
             return False
         return when <= expiry and odometer_km <= self.warranty_km
 
     def odometer_at(self, when: date) -> int:
-        """projected reading on a given date, from first registration"""
+        """belirli bir tarihteki tahmini kilometre, ilk tescilden itibaren"""
         if self.first_sale_date is None or when <= self.first_sale_date:
             return 0
         return max(0, round((when - self.first_sale_date).days * self.daily_km))
@@ -91,14 +91,14 @@ class VehicleFleet:
         return self.own + self.external
 
     def available_stock(self, when: date) -> list[Vehicle]:
-        """vehicles that have arrived and are still unsold on `when`"""
+        """`when` tarihinde gelmiş ama hâlâ satılmamış araçlar"""
         return [
             v for v in self.own
             if v.status == STATUS_IN_STOCK and v.arrival_date <= when
         ]
 
 def _daily_km_for(rng: random.Random, segment: str) -> float:
-    """annual mileage, expressed per day and varying by segment"""
+    """yıllık kilometre, gün başına ifade edilmiş ve segmente göre değişen"""
     annual = {
         "A": 9_000, "B": 12_000, "C": 16_000, "D": 21_000,
         "E": 23_000, "LCV": 34_000,
@@ -106,7 +106,7 @@ def _daily_km_for(rng: random.Random, segment: str) -> float:
     return clamp(rng.gauss(annual, annual * 0.30), annual * 0.30, annual * 2.2) / 365.0
 
 def generate_fleet(settings: Settings, master: MasterData) -> VehicleFleet:
-    """produce the vehicle population and place it into dealer stock"""
+    """araç popülasyonunu üret ve bayi stoğuna yerleştir"""
     rng = stream(settings.seed, "vehicles")
     holidays = build_holiday_calendar(
         settings.timeline.start - timedelta(days=200), settings.timeline.end
@@ -165,7 +165,7 @@ def generate_fleet(settings: Settings, master: MasterData) -> VehicleFleet:
     return fleet
 
 def _trim_popularity(rng: random.Random, trims: list[Versioned]) -> list[float]:
-    """sales weight per trim"""
+    """donanım başına satış ağırlığı"""
     weights = []
     for trim in trims:
         base = rng.lognormvariate(0.0, 0.75)
@@ -239,7 +239,7 @@ def _build_external_pool(
     fleet: VehicleFleet,
     serial_start: int,
 ) -> None:
-    """vehicles this distributor never sold, sized at 8% of the own fleet"""
+    """bu distribütörün hiç satmadığı araçlar, kendi filosunun %8'i kadar"""
 
     count = round(len(fleet.own) * 0.20)
     trims = list(master.model_trims)
@@ -267,12 +267,12 @@ def _build_external_pool(
         fleet.by_vin[vehicle.vin] = vehicle
 
 def _engine_no(brand: str, vin: str) -> str:
-    """a stable engine number derived from the vin"""
+    """vin'den türetilmiş kararlı bir motor numarası"""
     digest = hashlib.blake2b(vin.encode("ascii"), digest_size=4).digest()
     return f"{brand[:2].upper()}{int.from_bytes(digest, 'big') % 10**8:08d}"
 
 def _attach_source_records(fleet: VehicleFleet, settings: Settings) -> None:
-    """create the dms vehicle-stock view for own vehicles only"""
+    """sadece kendi araçları için dms araç stoğu görünümünü oluştur"""
     for vehicle in fleet.own:
         created = max(vehicle.arrival_date, settings.timeline.start)
         vehicle.record = Versioned(

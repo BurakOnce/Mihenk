@@ -1,4 +1,3 @@
--- claude yardımıyla yazıldı - scd2'yi ilk defa burada öğrendim.
 -- silver sadece güncel durumu tutuyor, o yüzden ilk gold yüklemesinde tarihsel
 -- versiyon üretmek için bronze'un aylık snapshot'larını lag/lead ile taramak
 -- gerekiyor (aksi halde her dealer tek versiyonla, bugün açılmış gibi başlar).
@@ -144,10 +143,10 @@ BEGIN
 
     SET @effective_date = ISNULL(@effective_date, CAST(SYSDATETIME() AS DATE));
 
-    -- CREATE TABLE #t + a separate INSERT INTO #t SELECT is rejected on
-    -- Fabric Warehouse ("not supported in distributed processing mode") -
-    -- confirmed down to the simplest possible case, nothing to do with this
-    -- query specifically. SELECT ... INTO #t is the form Fabric accepts.
+    -- CREATE TABLE #t + ayrı INSERT INTO #t SELECT fabric warehouse'ta
+    -- reddediliyor ("not supported in distributed processing mode") - en basit
+    -- durumda bile doğrulandı, bu sorguya özgü bir şey değil.
+    -- SELECT ... INTO #t fabric'in kabul ettiği biçim.
     SELECT
         s.dealer_code, s.dealer_name, s.dealer_type, s.province_code, s.city,
         s.region, s.address_line, s.phone, s.workshop_bay_count,
@@ -238,11 +237,11 @@ BEGIN
     SET NOCOUNT ON;
     SET @effective_date = ISNULL(@effective_date, CAST(SYSDATETIME() AS DATE));
 
-    -- SELECT ... INTO #t, not CREATE TABLE #t + INSERT INTO #t - see the
-    -- note in usp_load_dim_dealer above. the NULL placeholder needs an
-    -- explicit CAST here: SELECT INTO infers each column's type from what
-    -- it's given, and a bare untyped NULL leaves change_type with no type
-    -- to infer, rather than defaulting to VARCHAR(10) the later UPDATE needs.
+    -- CREATE TABLE #t + INSERT INTO #t değil, SELECT ... INTO #t - yukarıdaki
+    -- usp_load_dim_dealer notuna bak. buradaki NULL yer tutucuya açık CAST
+    -- gerekiyor: SELECT INTO her sütunun tipini verilenden çıkarıyor ve çıplak
+    -- tipsiz bir NULL, change_type'ı sonraki UPDATE'in ihtiyaç duyduğu VARCHAR(10)
+    -- yerine tipsiz bırakıyor.
     SELECT
         s.dealer_code, s.dealer_name, s.dealer_type, s.province_code, s.city,
         s.region, s.address_line, s.phone, s.workshop_bay_count,

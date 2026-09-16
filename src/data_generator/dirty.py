@@ -1,4 +1,4 @@
-"""deliberate data defects, and the answer key that makes them measurable.
+"""bilerek eklenen veri kusurları ve onları ölçülebilir kılan cevap anahtarı.
 
 bu modül en son çalışıyor, tüm türetilmiş dosyalar (satın alma, garanti, hedef)
 temiz veriden üretildikten sonra. daha erken bozarsam kirlilik türetilmiş
@@ -39,7 +39,7 @@ class InjectionResult:
     stats: dict = field(default_factory=dict)
 
 class _Injector:
-    """applies defects and records each one"""
+    """kusurları uygular ve her birini kaydeder"""
 
     def __init__(self, rng: random.Random) -> None:
         self.rng = rng
@@ -73,13 +73,13 @@ class _Injector:
         )
 
     def sample(self, rows: list, rate: float) -> list:
-        """pick a share of rows to corrupt, without replacement"""
+        """bozulacak satırların bir kısmını seç, tekrarsız"""
         count = min(len(rows), round(len(rows) * rate))
         return self.rng.sample(rows, count) if count else []
 
 def _corrupt_vins(inj: _Injector, settings: Settings, contracts: list[dict],
                   repair_orders: list[dict]) -> None:
-    """malformed vins and vins that fail their check digit"""
+    """bozuk yapılı vin'ler ve kontrol hanesi tutmayan vin'ler"""
     for rows, entity, key_col in (
         (contracts, "dms.sales_contract", "contract_no"),
         (repair_orders, "workshop.repair_order", "repair_order_no"),
@@ -104,7 +104,7 @@ def _corrupt_vins(inj: _Injector, settings: Settings, contracts: list[dict],
 
 def _duplicate_new_sales(inj: _Injector, settings: Settings,
                          contracts: list[dict]) -> None:
-    """the same vin sold as new twice - physically impossible, genuinely common"""
+    """aynı vin'in iki kez sıfır satılması - fiziksel olarak imkânsız, gerçekte yaygın"""
     new_sales = [c for c in contracts if c["sale_type"] == "NEW"]
     for row in inj.sample(new_sales, settings.dirty.duplicate_new_vehicle_sale):
         clone = dict(row)
@@ -153,7 +153,7 @@ def _corrupt_plates(inj: _Injector, settings: Settings, contracts: list[dict],
 
 def _rollback_odometers(inj: _Injector, settings: Settings,
                         repair_orders: list[dict]) -> None:
-    """make a reading lower than the same vin's previous one"""
+    """aynı vin'in önceki değerinden düşük bir kilometre yaz"""
     by_vin: dict[str, list[dict]] = {}
     for order in repair_orders:
         by_vin.setdefault(order["vin"], []).append(order)
@@ -176,7 +176,7 @@ def _rollback_odometers(inj: _Injector, settings: Settings,
 
 def _break_date_sequences(inj: _Injector, settings: Settings,
                           repair_orders: list[dict]) -> None:
-    """put a lifecycle stage out of order"""
+    """bir yaşam döngüsü aşamasını sıra dışına çıkar"""
     closed = [o for o in repair_orders if o["delivery_ts"] and o["repair_start_ts"]]
     for row in inj.sample(closed, settings.dirty.repair_order_date_out_of_order):
         style = inj.rng.choice(("delivery_before_checkin", "repair_before_inspection"))
@@ -214,7 +214,7 @@ def _corrupt_labour(inj: _Injector, settings: Settings, lines: list[dict]) -> No
                    column="labour_hours", before=before, after=after)
 
 def _overflow_warranty(inj: _Injector, settings: Settings, lines: list[dict]) -> None:
-    """claim more under warranty than the line is worth"""
+    """satırın tutarından fazlasını garanti kapsamında talep et"""
     for row in inj.sample(lines, settings.dirty.warranty_amount_overflow):
         before = row["warranty_amount"]
         after = round(float(row["line_amount"]) * inj.rng.uniform(1.15, 2.10), 2)
@@ -230,7 +230,7 @@ def _overflow_warranty(inj: _Injector, settings: Settings, lines: list[dict]) ->
 def _orphan_references(inj: _Injector, settings: Settings, master: MasterData,
                        fleet: VehicleFleet, lines: list[dict],
                        repair_orders: list[dict], purchase_lines: list[dict]) -> None:
-    """foreign keys pointing at things that do not exist"""
+    """var olmayan şeylere işaret eden yabancı anahtarlar"""
     known_parts = {p.key for p in master.parts}
 
     def unknown_part() -> str:
@@ -274,7 +274,7 @@ def _orphan_references(inj: _Injector, settings: Settings, master: MasterData,
 
 def _null_business_keys(inj: _Injector, settings: Settings, contracts: list[dict],
                         repair_orders: list[dict]) -> None:
-    """blank out a key column. cheap to inject, expensive to miss"""
+    """bir anahtar sütunu boşalt. eklemesi ucuz, kaçırması pahalı"""
     for rows, entity, key_col, blank_col in (
         (contracts, "dms.sales_contract", "contract_no", "customer_id"),
         (repair_orders, "workshop.repair_order", "repair_order_no", "vin"),
@@ -290,7 +290,7 @@ def _null_business_keys(inj: _Injector, settings: Settings, contracts: list[dict
 
 def _inconsistent_dates(inj: _Injector, settings: Settings,
                         contracts: list[dict]) -> None:
-    """write some dates the turkish way in a column that is otherwise iso"""
+    """iso formatlı bir sütuna bazı tarihleri türkçe biçimde yaz"""
     for row in inj.sample(contracts, settings.dirty.inconsistent_date_format):
         column = inj.rng.choice(("contract_date", "delivery_date", "registration_date"))
         before = row[column]
@@ -313,7 +313,7 @@ def inject_defects(
     repair_order_lines: list[dict],
     purchase_lines: list[dict],
 ) -> InjectionResult:
-    """corrupt the generated rows in place and return the answer key"""
+    """üretilen satırları yerinde boz ve cevap anahtarını döndür"""
     rng = stream(settings.seed, "dirty")
     inj = _Injector(rng)
 

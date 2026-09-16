@@ -16,10 +16,10 @@ rules = json.loads(rules_json, strict=False)
 # %%
 if not rules:
     try:
-        # spark.read.text() on a single small file in Files/ was unreliable here -
-        # it silently returned zero rows even once notebookutils.fs.ls() confirmed
-        # the file existed with the right byte count. notebookutils.fs.head() reads
-        # the bytes directly and is what actually works for a small one-off file.
+        # spark.read.text() files/ altındaki tek küçük dosyada güvenilmezdi -
+        # notebookutils.fs.ls() dosyanın doğru boyutta var olduğunu gösterdiği hâlde
+        # sessizce sıfır satır döndürdü. notebookutils.fs.head() byte'ları doğrudan
+        # okuyor, küçük tek seferlik bir dosya için gerçekten çalışan bu.
         rules = json.loads(utils.fs.head("Files/_dq_rules.json", 1_000_000))
         print("rules loaded from Files/_dq_rules.json (manual run)")
     except Exception as exc:
@@ -94,17 +94,17 @@ for rule in rules:
     )
 
 # %%
-# an explicit schema, not inference - error_message is None on every row
-# whenever every rule passes, and spark can't infer a type from an all-null
-# column. a healthy run breaking createDataFrame() is a good bug to have found.
+# şema çıkarımı değil açık şema - bütün kurallar geçince error_message her
+# satırda none oluyor ve spark tamamen boş bir sütunun tipini çıkaramıyor.
+# sağlıklı bir çalıştırmanın createDataFrame()'i kırması, bulunması iyi bir hata.
 RESULT_SCHEMA = "batch_id STRING, rule_id INT, rule_code STRING, target_table STRING, " \
     "rows_evaluated LONG, rows_violated LONG, violation_rate DOUBLE, severity STRING, " \
     "outcome STRING, error_message STRING, executed_ts TIMESTAMP, duration_seconds INT"
 result_df = spark.createDataFrame(results, schema=RESULT_SCHEMA)
 
 # %%
-# unionByName only takes one other frame at a time - not the variadic
-# UNION ALL a SQL person expects - so multiple violation frames fold in one by one.
+# unionByName bir seferde tek bir frame alıyor - sql'deki çoklu UNION ALL
+# gibi değil - o yüzden ihlal frame'leri tek tek katlanıyor.
 violation_df = None
 for frame in violations_frames:
     violation_df = frame if violation_df is None else violation_df.unionByName(frame)

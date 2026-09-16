@@ -1,4 +1,4 @@
-"""turkish identifiers and contact details: tckn, vkn, phone, email"""
+"""türk kimlik ve iletişim bilgileri: tckn, vkn, telefon, e-posta"""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import random
 import unicodedata
 
 def generate_tckn(rng: random.Random) -> str:
-    """a synthetic tckn satisfying the published checksum rules"""
+    """yayınlanmış kontrol kurallarını sağlayan sentetik bir tckn"""
     digits = [rng.randint(1, 9)] + [rng.randint(0, 9) for _ in range(8)]
 
     odd_sum = sum(digits[0:9:2])
@@ -19,7 +19,7 @@ def generate_tckn(rng: random.Random) -> str:
     return "".join(str(d) for d in digits)
 
 def is_valid_tckn(value: str) -> bool:
-    """verify a tckn's format and both check digits"""
+    """bir tckn'nin formatını ve iki kontrol hanesini doğrula"""
     if not isinstance(value, str) or len(value) != 11 or not value.isdigit():
         return False
     if value[0] == "0":
@@ -34,7 +34,7 @@ def is_valid_tckn(value: str) -> bool:
     return sum(digits[:10]) % 10 == digits[10]
 
 def generate_vkn(rng: random.Random) -> str:
-    """a ten-digit corporate tax number"""
+    """on haneli kurumsal vergi numarası"""
     return "".join(str(rng.randint(0, 9)) for _ in range(10))
 
 _MOBILE_PREFIXES = (
@@ -45,7 +45,7 @@ _MOBILE_PREFIXES = (
 )
 
 def generate_mobile(rng: random.Random) -> tuple[str, str]:
-    """one mobile number in two source-system formats"""
+    """tek bir cep numarası, iki kaynak sistem formatında"""
     prefix = rng.choice(_MOBILE_PREFIXES)
     body = f"{rng.randint(0, 9_999_999):07d}"
     dms = f"0{prefix}{body}"
@@ -53,7 +53,7 @@ def generate_mobile(rng: random.Random) -> tuple[str, str]:
     return dms, crm
 
 def ascii_fold(text: str) -> str:
-    """strip turkish diacritics: 'şükrü öztürk' -> 'sukru ozturk'"""
+    """türkçe karakterleri düzleştir: 'şükrü öztürk' -> 'sukru ozturk'"""
     manual = str.maketrans({"ı": "i", "İ": "I", "ş": "s", "Ş": "S", "ğ": "g", "Ğ": "G"})
     text = text.translate(manual)
     decomposed = unicodedata.normalize("NFKD", text)
@@ -65,7 +65,7 @@ _EMAIL_DOMAINS = (
 )
 
 def generate_email(rng: random.Random, first_name: str, last_name: str) -> str:
-    """a plausible personal email built from the person's own name"""
+    """kişinin kendi adından türetilmiş makul bir kişisel e-posta"""
     first = ascii_fold(first_name).lower().replace(" ", "")
     last = ascii_fold(last_name).lower().replace(" ", "")
     shape = rng.choice(["dot", "joined", "initial", "numbered"])
@@ -82,7 +82,7 @@ def generate_email(rng: random.Random, first_name: str, last_name: str) -> str:
     return f"{local}@{rng.choice(_EMAIL_DOMAINS)}"
 
 def generate_corporate_email(rng: random.Random, company_name: str) -> str:
-    """a company mailbox, derived from the trading name"""
+    """ticari unvandan türetilmiş bir şirket e-postası"""
     stem = ascii_fold(company_name).lower()
     stem = "".join(c for c in stem if c.isalnum())[:18] or "firma"
     box = rng.choice(["info", "muhasebe", "satinalma", "filo", "iletisim"])

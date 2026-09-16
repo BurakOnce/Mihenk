@@ -1,4 +1,4 @@
-"""customers in two source systems - the master data management problem"""
+"""iki kaynak sistemde müşteriler - ana veri yönetimi problemi"""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ DIFFICULTY_EASY, DIFFICULTY_HARD, DIFFICULTY_NONE = "EASY", "HARD", "NONE"
 
 @dataclass
 class CustomerUniverse:
-    """the two source views, plus the ground truth linking them"""
+    """iki kaynak görünümü, artı onları birbirine bağlayan gerçek cevap"""
 
     dms: list[Versioned] = field(default_factory=list)
     crm: list[Versioned] = field(default_factory=list)
@@ -56,14 +56,14 @@ class CustomerUniverse:
     customer_since: dict[str, date] = field(default_factory=dict)
 
 def _abbreviate_first(name: str) -> str:
-    """'mehmet ali yılmaz' -> 'm. ali yılmaz'. very common in turkish records"""
+    """'mehmet ali yılmaz' -> 'm. ali yılmaz'. türkçe kayıtlarda çok yaygın"""
     parts = name.split()
     if len(parts) < 2:
         return name
     return f"{parts[0][0]}. " + " ".join(parts[1:])
 
 def _swap_corporate_suffix(rng: random.Random, name: str) -> str:
-    """rewrite the legal-form suffix in a different but equivalent style"""
+    """şirket türü ekini farklı ama eşdeğer bir biçimde yeniden yaz"""
     for suffix in sorted(_CORPORATE_SUFFIXES, key=len, reverse=True):
         if name.endswith(suffix):
             stem = name[: -len(suffix)].strip()
@@ -72,7 +72,7 @@ def _swap_corporate_suffix(rng: random.Random, name: str) -> str:
     return f"{name} {rng.choice(_CORPORATE_SUFFIXES)}"
 
 def _incidental_variant(rng: random.Random, name: str, is_corporate: bool) -> str:
-    """apply one hard-to-match distortion"""
+    """eşleştirmesi zor bir bozulma uygula"""
     options = ["fold", "whitespace", "punctuation"]
     options.append("suffix" if is_corporate else "abbreviate")
 
@@ -91,7 +91,7 @@ def _incidental_variant(rng: random.Random, name: str, is_corporate: bool) -> st
 def _make_canonical(
     rng: random.Random, faker: Faker, index: int, settings: Settings
 ) -> dict:
-    """one real person or company, before either system got hold of them"""
+    """gerçek bir kişi ya da şirket, iki sistem de onu kaydetmeden önceki hâli"""
     is_corporate = rng.random() < 0.22
     province = rng.choices(
         ref.PROVINCES, weights=[p.population_m for p in ref.PROVINCES], k=1
@@ -144,7 +144,7 @@ def _make_canonical(
     }
 
 def _dms_view(rng: random.Random, canonical: dict, customer_id: str, hard: bool) -> Versioned:
-    """the dms record: legacy conventions, upper case, identity number always present"""
+    """dms kaydı: eski sistem alışkanlıkları, büyük harf, tckn her zaman dolu"""
     name = canonical["display_name"]
     if hard:
         name = _incidental_variant(rng, name, canonical["customer_type"] == TYPE_CORPORATE)
@@ -171,7 +171,7 @@ def _dms_view(rng: random.Random, canonical: dict, customer_id: str, hard: bool)
     )
 
 def _crm_view(rng: random.Random, canonical: dict, crm_id: str, hard: bool) -> Versioned:
-    """the crm record: title case, nested contacts, identity number often missing"""
+    """crm kaydı: baş harf büyük, iç içe iletişim bilgisi, tckn çoğunlukla eksik"""
     name = canonical["display_name"]
     if hard:
         name = _incidental_variant(rng, name, canonical["customer_type"] == TYPE_CORPORATE)
@@ -206,7 +206,7 @@ def _crm_view(rng: random.Random, canonical: dict, crm_id: str, hard: bool) -> V
 def _apply_customer_changes(
     rng: random.Random, record: Versioned, settings: Settings, *, is_crm: bool
 ) -> None:
-    """contact detail churn, which drives the incremental extract"""
+    """iletişim bilgisi değişimleri, artımlı çıkarımı süren şey"""
     earliest = record.created_on + timedelta(days=60)
     if earliest >= settings.timeline.end:
         return
@@ -232,7 +232,7 @@ def _apply_customer_changes(
                 )
 
 def generate_customers(settings: Settings) -> CustomerUniverse:
-    """build the customer universe across both source systems"""
+    """her iki kaynak sistemi kapsayan müşteri evrenini kur"""
     rng = stream(settings.seed, "customers")
     faker = Faker("tr_TR")
     faker.seed_instance(rng.randint(0, 2**31))

@@ -1,4 +1,4 @@
-"""repair orders: the aftersales lifecycle, and the odometer that ties it together"""
+"""iş emirleri: satış sonrası yaşam döngüsü ve onu birbirine bağlayan kilometre sayacı"""
 
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ class WorkshopResult:
 def _monthly_part_prices(
     master: MasterData, snapshots: list[date]
 ) -> dict[tuple[str, int, int], float]:
-    """part list price per month"""
+    """ay başına parça liste fiyatı"""
     prices: dict[tuple[str, int, int], float] = {}
     for snapshot in snapshots:
         for part in master.parts:
@@ -114,7 +114,7 @@ def _next_working_day(when: date, holidays: dict[date, float]) -> date:
     return when
 
 def _advance(moment: datetime, hours: float, holidays: dict[date, float]) -> datetime:
-    """move forward `hours` of *shop* time, not wall-clock time"""
+    """`hours` kadar *atölye* zamanı ilerle, duvar saati değil"""
     day_start, day_end = time(8, 0), time(18, 0)
     remaining = hours
 
@@ -144,13 +144,13 @@ def _advance(moment: datetime, hours: float, holidays: dict[date, float]) -> dat
     return moment
 
 def _fmt(moment: datetime | None) -> str:
-    """timestamps are written as strings; a null stage is an empty string"""
+    """zaman damgaları metin olarak yazılır; boş aşama boş metindir"""
     return moment.strftime("%Y-%m-%d %H:%M:%S") if moment else ""
 
 def _scheduled_maintenance_dates(
     vehicle: Vehicle, window_start: date, window_end: date
 ) -> list[date]:
-    """when this vehicle is due for its scheduled services"""
+    """bu aracın periyodik bakımlarının ne zaman geldiği"""
     if vehicle.daily_km <= 0:
         return []
 
@@ -168,7 +168,7 @@ def _scheduled_maintenance_dates(
 def _pick_service_type(
     rng: random.Random, when: date, under_warranty: bool
 ) -> ref.ServiceType:
-    """choose an unscheduled job type, respecting season and warranty status"""
+    """mevsime ve garanti durumuna göre plansız bir iş tipi seç"""
     candidates: list[ref.ServiceType] = []
     weights: list[float] = []
 
@@ -337,7 +337,7 @@ def _next_odometer(
     when: date,
     readings: dict[str, list[tuple[date, int]]],
 ) -> int:
-    """a reading that is never lower than this vin's previous one"""
+    """bu vin'in öncekinden asla düşük olmayan bir kilometre değeri"""
     projected = vehicle.odometer_at(when)
     if vehicle.is_external:
 
@@ -361,7 +361,7 @@ def _build_order(
     vehicle, when, odometer, service, under_warranty,
     dealer_code, order_no,
 ) -> tuple[dict, list[dict], dict]:
-    """one repair order and its lines, walked through every lifecycle stage"""
+    """tek iş emri ve satırları, her yaşam döngüsü aşamasından geçirilmiş"""
 
     has_appointment = rng.random() < 0.62
     appointment_date = (
@@ -542,7 +542,7 @@ def _build_lines(
     return lines, totals
 
 def _split_hours(rng: random.Random, total: float, parts: int) -> list[float]:
-    """divide the total labour time across the operation lines"""
+    """toplam işçilik süresini işlem satırlarına böl"""
     if parts <= 1:
         return [total]
     cuts = sorted(rng.uniform(0.15, 0.85) for _ in range(parts - 1))
@@ -553,7 +553,7 @@ def _split_hours(rng: random.Random, total: float, parts: int) -> list[float]:
     return shares
 
 def _part_quantity(rng: random.Random, group: str) -> float:
-    """quantities follow the part: four tyres, one gearbox, litres of oil"""
+    """miktar parçaya göre: dört lastik, bir şanzıman, litre litre yağ"""
     if group == "TYRE":
         return rng.choice((1, 2, 4, 4))
     if group == "FLUID":

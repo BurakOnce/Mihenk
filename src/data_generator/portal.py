@@ -1,4 +1,4 @@
-"""distributor portal: warranty claim outcomes and recall campaigns"""
+"""distribütör portalı: garanti talebi sonuçları ve geri çağırma kampanyaları"""
 
 from __future__ import annotations
 
@@ -130,7 +130,7 @@ def _generate_recalls(
     master: MasterData,
     fleet: VehicleFleet,
 ) -> tuple[list[dict], list[dict], dict]:
-    """campaigns scoped by model and production window, as real recalls are"""
+    """gerçek geri çağırmalar gibi model ve üretim aralığına göre kapsamlanan kampanyalar"""
     campaigns: list[dict] = []
     coverage: list[dict] = []
 

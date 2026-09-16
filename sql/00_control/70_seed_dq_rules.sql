@@ -1,5 +1,5 @@
--- generated file, do not edit by hand - see tools/generate_ctl_seed.py
--- generated 2026-09-13 21:37:24 - 25 rules, 21 codes, 15 injectable defects covered
+-- üretilmiş dosya, elle düzenleme - bkz. tools/generate_ctl_seed.py
+-- 2026-09-13 21:37:24 tarihinde üretildi - 25 kural, 21 kod, 15 enjekte edilebilir kusur kapsanıyor
 
 DELETE FROM ctl.dq_rule;
 GO

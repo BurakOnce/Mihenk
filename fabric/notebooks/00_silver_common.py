@@ -22,7 +22,7 @@ SILVER_AUDIT_COLUMNS = ["_silver_ts", "_batch_id", "_source_system", "_row_hash"
 
 # %%
 def parse_date(column: str, formats: list[str] = None) -> "F.Column":
-    """first format that parses wins; null if none do"""
+    """ayrıştırabilen ilk format kazanır; hiçbiri ayrıştıramazsa null"""
     formats = formats or DATE_FORMATS
     return F.coalesce(*[F.to_date(F.col(column), fmt) for fmt in formats])
 
@@ -32,7 +32,7 @@ def parse_timestamp(column: str) -> "F.Column":
 
 # %%
 def parse_decimal(column: str, turkish: bool = False, precision: int = 18, scale: int = 2):
-    """cast a string amount to decimal, handling the turkish convention"""
+    """metin tutarı decimal'e çevirir, türkçe virgül ayracını da ele alır"""
     source = F.col(column)
     if turkish:
         source = F.regexp_replace(F.regexp_replace(source, r"\.", ""), ",", ".")
@@ -43,7 +43,7 @@ def parse_decimal(column: str, turkish: bool = False, precision: int = 18, scale
 
 # %%
 def clean_string(column: str) -> "F.Column":
-    """trim, collapse internal whitespace, turn blanks into nulls"""
+    """kırp, içerideki boşlukları tekle, boş değerleri null yap"""
     cleaned = F.regexp_replace(F.trim(F.col(column)), r"\s+", " ")
     return F.when(cleaned == "", None).otherwise(cleaned)
 
@@ -64,7 +64,7 @@ TURKISH_FOLD = [
 
 # %%
 def normalise_for_matching(column: str) -> "F.Column":
-    """an ascii, upper-case, punctuation-free key for fuzzy comparison"""
+    """bulanık karşılaştırma için ascii, büyük harf, noktalamasız anahtar"""
     result = F.col(column)
     for source_char, target_char in TURKISH_FOLD:
         result = F.regexp_replace(result, source_char, target_char)
@@ -84,7 +84,7 @@ COMPANY_SUFFIXES = [
 
 # %%
 def strip_company_suffix(column: "F.Column") -> "F.Column":
-    """remove the legal form so the trading name is what gets compared"""
+    """şirket türü ekini kaldır ki karşılaştırılan şey ticari unvan olsun"""
     result = column
     for suffix in COMPANY_SUFFIXES:
         result = F.regexp_replace(result, f" {suffix}$", "")
@@ -92,7 +92,7 @@ def strip_company_suffix(column: "F.Column") -> "F.Column":
 
 # %%
 def hash_pii(column: str, salt: str) -> "F.Column":
-    """salted sha-256. deterministic across sources so mdm can still match"""
+    """tuzlu sha-256. kaynaklar arası deterministik ki mdm hâlâ eşleştirebilsin"""
     return F.when(
         F.col(column).isNull() | (F.trim(F.col(column)) == ""), None
     ).otherwise(
@@ -101,7 +101,7 @@ def hash_pii(column: str, salt: str) -> "F.Column":
 
 # %%
 def mask_identity_no(column: str) -> "F.Column":
-    """`12345678901` -> `123*****901`. enough to confirm, not enough to use"""
+    """`12345678901` -> `123*****901`. doğrulamaya yeter, kullanmaya yetmez"""
     source = F.trim(F.col(column))
     return F.when(F.length(source) < 8, None).otherwise(
         F.concat(F.substring(source, 1, 3), F.lit("*****"), F.substring(source, -3, 3))
@@ -116,7 +116,7 @@ def mask_phone(column: str) -> "F.Column":
 
 # %%
 def mask_email(column: str) -> "F.Column":
-    """`sukru.ozturk@gmail.com` -> `s***@gmail.com`. domain kept: it is not"""
+    """`sukru.ozturk@gmail.com` -> `s***@gmail.com`. alan adı kalıyor, kişisel değil"""
     source = F.trim(F.col(column))
     local = F.substring_index(source, "@", 1)
     domain = F.substring_index(source, "@", -1)
@@ -126,7 +126,7 @@ def mask_email(column: str) -> "F.Column":
 
 # %%
 def mask_plate(column: str) -> "F.Column":
-    """`34 abc 12` -> `34 *** 12`. the province survives because regional"""
+    """`34 abc 12` -> `34 *** 12`. il kodu kalıyor, bölgesel analiz için lazım"""
     source = F.trim(F.col(column))
     return F.when(F.length(source) < 5, None).otherwise(
         F.regexp_replace(source, r"(?<= )[A-Z]+(?= )", "***")
@@ -141,7 +141,7 @@ _VIN_WEIGHTS = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2]
 
 # %%
 def vin_is_well_formed(column: str) -> "F.Column":
-    """structural check only: 17 characters, no i, o or q"""
+    """sadece yapısal kontrol: 17 karakter, i, o veya q yok"""
     vin = F.upper(F.trim(F.col(column)))
     return (
         vin.isNotNull()
@@ -152,7 +152,7 @@ def vin_is_well_formed(column: str) -> "F.Column":
 
 # %%
 def vin_check_digit(column: str) -> "F.Column":
-    """the expected character for position 9, per iso 3779"""
+    """iso 3779'a göre 9. pozisyonda olması gereken karakter"""
     vin = F.upper(F.trim(F.col(column)))
     digits = F.translate(vin, _VIN_LETTERS, _VIN_VALUES)
 
@@ -168,7 +168,7 @@ def vin_check_digit(column: str) -> "F.Column":
 
 # %%
 def vin_check_digit_valid(column: str) -> "F.Column":
-    """1 when position 9 matches the computed digit, 0 when it does not"""
+    """9. pozisyon hesaplanan haneyle eşleşiyorsa 1, değilse 0"""
     vin = F.upper(F.trim(F.col(column)))
     return F.when(~vin_is_well_formed(column), None).otherwise(
         F.when(F.substring(vin, 9, 1) == vin_check_digit(column), 1).otherwise(0)
@@ -181,7 +181,7 @@ def vin_check_digit_valid(column: str) -> "F.Column":
 
 # %%
 def latest_by_key(df: DataFrame, keys: list[str], order_by: str) -> DataFrame:
-    """one row per key - the most recent, deterministically"""
+    """anahtar başına tek satır - en güncel olan, deterministik şekilde"""
     window = (
         Window.partitionBy(*keys)
         .orderBy(
@@ -199,7 +199,7 @@ def latest_by_key(df: DataFrame, keys: list[str], order_by: str) -> DataFrame:
 
 # %%
 def build_fx_lookup(fx_df: DataFrame) -> DataFrame:
-    """one row per currency per date, plus a synthetic try series"""
+    """para birimi ve tarih başına tek satır, artı yapay bir try serisi"""
     rates = (
         fx_df.select(
             F.col("currency_code").alias("fx_currency"),
@@ -224,7 +224,7 @@ def convert_to_try(
     currency_column: str = "currency_code",
     date_column: str = "contract_date",
 ) -> DataFrame:
-    """attach an fx rate by forward fill and convert the listed amounts"""
+    """forward fill ile kur bağla ve verilen tutarları çevir"""
     df.createOrReplaceTempView("_txn")
     fx_rates.createOrReplaceTempView("_fx")
 
@@ -245,8 +245,8 @@ def convert_to_try(
         ) AS r
           ON  r.fx_currency = t.{currency_column}
           AND t.{date_column} >= r.fx_date
-          -- The forward fill: this rate applies until the next one is published,
-          -- and the final rate applies indefinitely.
+          -- forward fill: bu kur bir sonraki yayınlanana kadar geçerli,
+          -- son kur ise süresiz geçerli.
           AND (r.next_fx_date IS NULL OR t.{date_column} < r.next_fx_date)
         """
     )
@@ -270,7 +270,7 @@ def merge_into_silver(
     key_columns: list[str],
     partition_by: list[str] = None,
 ) -> dict:
-    """upsert into a silver delta table, creating it on first run"""
+    """silver delta tablosuna upsert, ilk çalıştırmada tabloyu oluşturur"""
     if not spark.catalog.tableExists(table_name):
         writer = df.write.format("delta").mode("overwrite")
         if partition_by:
@@ -307,7 +307,7 @@ def quarantine(
     reason_column: str,
     batch_id: str,
 ) -> int:
-    """divert failing rows to a quarantine table, keeping the reason"""
+    """hatalı satırları sebebiyle birlikte karantina tablosuna yönlendir"""
     if df.rdd.isEmpty():
         return 0
 
@@ -328,7 +328,7 @@ def quarantine(
 # %%
 def add_silver_audit(df: DataFrame, batch_id: str, source_system: str,
                      business_columns: list[str]) -> DataFrame:
-    """stamp the row and recompute the hash over the cleansed values"""
+    """satırı damgala ve hash'i temizlenmiş değerler üzerinden yeniden hesapla"""
     return (
         df.withColumn("_silver_ts", F.current_timestamp())
         .withColumn("_batch_id", F.lit(batch_id))

@@ -1,7 +1,4 @@
-"""vin generation and validation per iso 3779, including the check digit.
-
-claude yardımıyla yazıldı - iso 3779 check digit algoritmasını buradan öğrendim.
-"""
+"""iso 3779'a göre vin üretimi ve doğrulaması, kontrol hanesi dahil."""
 
 from __future__ import annotations
 
@@ -26,7 +23,7 @@ _TRANSLITERATION = {
 _WEIGHTS = (8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2)
 
 def transliterate(char: str) -> int:
-    """numeric value of one vin character"""
+    """bir vin karakterinin sayısal değeri"""
     if char.isdigit():
         return int(char)
     try:
@@ -35,7 +32,7 @@ def transliterate(char: str) -> int:
         raise ValueError(f"{char!r} is not a legal VIN character") from None
 
 def check_digit(vin: str) -> str:
-    """compute the iso 3779 check digit for a 17-character vin"""
+    """17 karakterlik bir vin için iso 3779 kontrol hanesini hesapla"""
     if len(vin) != VIN_LENGTH:
         raise ValueError(f"a VIN must be {VIN_LENGTH} characters, got {len(vin)}")
 
@@ -44,14 +41,14 @@ def check_digit(vin: str) -> str:
     return "X" if remainder == 10 else str(remainder)
 
 def is_check_digit_valid(vin: str) -> bool:
-    """true when position 9 matches the computed check digit"""
+    """9. pozisyon hesaplanan kontrol hanesiyle eşleşiyorsa true"""
     try:
         return check_digit(vin) == vin.upper()[CHECK_DIGIT_POSITION]
     except (ValueError, IndexError):
         return False
 
 def is_well_formed(vin: str) -> bool:
-    """structural validity only: length, alphabet, forbidden letters"""
+    """sadece yapısal geçerlilik: uzunluk, alfabe, yasak harfler"""
     if not isinstance(vin, str) or len(vin) != VIN_LENGTH:
         return False
     upper = vin.upper()
@@ -60,7 +57,7 @@ def is_well_formed(vin: str) -> bool:
     return all(c in VIN_ALPHABET for c in upper)
 
 def is_valid(vin: str) -> bool:
-    """fully valid: well formed *and* check digit correct"""
+    """tamamen geçerli: yapısı doğru *ve* kontrol hanesi tutuyor"""
     return is_well_formed(vin) and is_check_digit_valid(vin)
 
 _YEAR_LETTERS = "ABCDEFGHJKLMNPRSTVWXY"
@@ -70,14 +67,14 @@ _YEAR_TO_CODE = {_YEAR_BASE + i: c for i, c in enumerate(_YEAR_LETTERS)}
 _CODE_TO_YEAR = {c: y for y, c in _YEAR_TO_CODE.items()}
 
 def model_year_code(year: int) -> str:
-    """position-10 character for a model year (supported range 2010-2030)"""
+    """model yılı için 10. pozisyon karakteri (desteklenen aralık 2010-2030)"""
     try:
         return _YEAR_TO_CODE[year]
     except KeyError:
         raise ValueError(f"model year {year} outside the supported 2010-2030 cycle") from None
 
 def year_from_code(code: str) -> int | None:
-    """inverse of `model_year_code`. returns none for an unrecognised code"""
+    """`model_year_code`'un tersi. tanınmayan kod için none döner"""
     return _CODE_TO_YEAR.get(code.upper())
 
 def build_vin(
@@ -87,7 +84,7 @@ def build_vin(
     plant_code: str,
     serial: int,
 ) -> str:
-    """assemble a structurally correct vin with the right check digit"""
+    """doğru kontrol haneli, yapısal olarak doğru bir vin oluştur"""
     if len(wmi) != 3:
         raise ValueError("WMI must be 3 characters")
     if len(vds) != 5:
@@ -105,11 +102,11 @@ def build_vin(
     return body[:CHECK_DIGIT_POSITION] + check_digit(body) + body[CHECK_DIGIT_POSITION + 1:]
 
 def random_vds(rng: random.Random) -> str:
-    """a 5-character descriptor block, used once per model/trim"""
+    """5 karakterlik tanımlayıcı blok, model/donanım başına bir kez kullanılır"""
     return "".join(rng.choice(VIN_ALPHABET) for _ in range(5))
 
 def corrupt_format(rng: random.Random, vin: str) -> tuple[str, str]:
-    """break a vin's structure. returns (broken_vin, defect_name)"""
+    """bir vin'in yapısını boz. (broken_vin, defect_name) döner"""
     mode = rng.choice(["truncated", "forbidden_letter", "too_long"])
 
     if mode == "truncated":
@@ -121,7 +118,7 @@ def corrupt_format(rng: random.Random, vin: str) -> tuple[str, str]:
     return vin + rng.choice(string.digits), "vin_length"
 
 def corrupt_check_digit(rng: random.Random, vin: str) -> tuple[str, str]:
-    """transpose two characters so the vin stays well formed but fails the check"""
+    """iki karakterin yerini değiştir; vin yapısal olarak doğru kalır ama kontrolden geçmez"""
 
     for _ in range(10):
         i = rng.randrange(11, VIN_LENGTH - 1)

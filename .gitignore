@@ -33,8 +33,6 @@ desktop.ini
 *.pbix.bak
 *.tmp
 
-# --- Assistant / scratch files (never part of the deliverable) ---
-CLAUDE.md
-.claude/
+# --- Scratch files (never part of the deliverable) ---
 scratch/
 _local_test_setup.sql

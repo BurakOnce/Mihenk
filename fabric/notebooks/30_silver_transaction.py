@@ -165,7 +165,7 @@ orders = (
 
 # %%
 def hours_between(start: str, end: str) -> "F.Column":
-    """elapsed hours, null when either end is missing"""
+    """geçen saat, iki uçtan biri eksikse null"""
     return F.when(
         F.col(start).isNotNull() & F.col(end).isNotNull(),
         ((F.unix_timestamp(F.col(end)) - F.unix_timestamp(F.col(start))) / 3600.0)
