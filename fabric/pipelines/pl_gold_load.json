@@ -1,7 +1,7 @@
 {
   "name": "pl_gold_load",
   "properties": {
-    "description": "Gold katmanı: usp_load_gold (dimension'lar, inferred members, fact'ler, aggregate'ler) ve ardından usp_verify_gold. Backfill buradan çağrılmaz; o tek seferlik ilk yükleme (usp_initial_load).",
+    "description": "Gold katmanı: fact ve aggregate tabloları boşaltılır (Silver tam güncel durumu tuttuğu için Gold her gece Silver'dan tam yeniden kurulur; dimension'lara dokunulmaz, SCD2 geçmişi korunur), sonra usp_load_gold (dimension'lar, inferred members, fact'ler, aggregate'ler) ve ardından usp_verify_gold. Backfill buradan çağrılmaz; o tek seferlik ilk yükleme (usp_initial_load).",
     "activities": [
       {
         "name": "Set batch id",
@@ -55,11 +55,167 @@
         }
       },
       {
-        "name": "Log start usp_load_gold",
+        "name": "Log start reset_facts",
         "type": "Script",
         "dependsOn": [
           {
             "activity": "Start batch",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'gold', @step_name = 'reset_facts';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run reset facts",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log start reset_facts",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "TRUNCATE TABLE gold.fact_vehicle_sale; TRUNCATE TABLE gold.fact_repair_order; TRUNCATE TABLE gold.fact_repair_order_line; TRUNCATE TABLE gold.fact_part_purchase; TRUNCATE TABLE gold.fact_vehicle_inventory_daily; TRUNCATE TABLE gold.fact_recall_coverage; TRUNCATE TABLE gold.fact_data_quality; TRUNCATE TABLE gold.agg_monthly_dealer_model_sale; TRUNCATE TABLE gold.agg_monthly_dealer_target; TRUNCATE TABLE gold.agg_monthly_service_summary;",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success reset_facts",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run reset facts",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start reset_facts').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure reset_facts",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run reset facts",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start reset_facts').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run reset facts').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start usp_load_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log success reset_facts",
             "dependencyConditions": [
               "Succeeded"
             ]

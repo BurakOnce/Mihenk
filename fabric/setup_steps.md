@@ -253,11 +253,20 @@ later steps are skipped, and `End batch` still closes the batch so
 `ctl.vw_batch_reconciliation` shows an honest picture rather than a batch that
 never ended.
 
-**`pl_gold_load`** — two logged Script steps, no notebooks:
+**`pl_gold_load`** — three logged Script steps, no notebooks:
 
 ```
-Start batch (gold)  →  Run usp_load_gold  →  Run usp_verify_gold  →  End batch
+Start batch (gold)  →  Run reset facts  →  Run usp_load_gold  →  Run usp_verify_gold  →  End batch
 ```
+
+`Run reset facts` truncates the seven fact tables and three aggregates. The
+fact loads delete by `_batch_id`, so a second run under a *new* batch id would
+insert every Silver row again (this doubled `fact_vehicle_sale` once — 29,431 →
+58,862). Silver holds the complete current state, so the honest contract is:
+**Gold facts are rebuilt in full from Silver every night; dimensions are
+never truncated and keep their SCD2 history.** At 9.5 M rows that is minutes on
+an F2. The proper long-term fix — deleting by natural key so facts become truly
+incremental — is a follow-up, not a prerequisite.
 
 `usp_load_gold` is the incremental path (dimensions, inferred members, facts,
 aggregates). The backfill procedures are deliberately *not* here — they are the
