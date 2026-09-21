@@ -206,7 +206,7 @@
                   {
                     "type": "Query",
                     "text": {
-                      "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log step start').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run bronze notebook').output.error.message), '''', '''''')}';",
+                      "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log step start').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run bronze notebook').output.message), '''', '''''')}';",
                       "type": "Expression"
                     }
                   }

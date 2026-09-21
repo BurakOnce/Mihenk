@@ -190,7 +190,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 10_silver_master').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 10_silver_master').output.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -351,7 +351,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 20_silver_customer_mdm').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 20_silver_customer_mdm').output.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -505,7 +505,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 30_silver_transaction').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 30_silver_transaction').output.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -700,7 +700,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 40_silver_dq').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 40_silver_dq').output.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }

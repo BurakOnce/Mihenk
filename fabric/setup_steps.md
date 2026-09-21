@@ -312,6 +312,41 @@ the notebooks is a placeholder. In a real deployment the parameter is bound to a
 Key Vault secret at the `pl_daily_load` level and flows down; nothing about the
 salt lives in a `.py` file or in Git.
 
+### What running the orchestration for real found
+
+Two more genuine defects, both invisible from reading the code, both surfaced
+the first time `pl_silver_transform` ran end to end rather than notebook by
+notebook.
+
+**`merge_into_silver` assumes every Silver table carries `_row_hash`; one
+didn't.** `20_silver_customer_mdm` writes two tables — `silver.customer` (via
+`add_silver_audit`, which does add `_row_hash`) and `silver.customer_xref`
+(hand-stamped with only `_batch_id` and `_silver_ts`). The merge's
+`whenMatchedUpdateAll(condition="t._row_hash <> s._row_hash")` is unconditional,
+so the second call failed with `DELTA_MERGE_UNRESOLVED_EXPRESSION` — the
+column simply isn't there. The first manual run never hit this: the table
+didn't exist yet, so `merge_into_silver` took its `overwrite`-and-create branch
+and skipped the merge condition entirely. It took a second real run — from the
+pipeline, against an existing table — to reach the code path at all. Fixed by
+routing `xref` through `add_silver_audit` like every other Silver table, so it
+gets a real `_row_hash` computed from its own business columns.
+
+**A Notebook activity's failure output has no `.error` property.** Every
+`Log failure` step's `@error_message` was written as
+`activity('Run X').output.error.message` — copied from the pattern that already
+existed in `pl_bronze_ingest.json`. The first time a notebook activity actually
+failed, evaluating that expression failed too: Fabric's own error message named
+the actual available properties (`status, result, message,
+SparkMonitoringURL, ...`) and the error text sits directly at `output.message`,
+not nested under `output.error`. This was a latent bug in `pl_bronze_ingest.json`
+from the start — Bronze had simply never failed a notebook activity in a run
+that reached that branch. Script activities are unaffected; their error output
+does live under `output.error.message`, so every `Log failure` step now branches
+on the activity type it is watching.
+
+Neither of these would have been caught by running each notebook by hand from
+the workspace UI, which is exactly the gap the orchestration was built to close.
+
 ---
 
 ## 6. What to expect on the first run

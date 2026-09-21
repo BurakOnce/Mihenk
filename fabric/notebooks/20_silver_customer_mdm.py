@@ -382,11 +382,12 @@ customer = add_silver_audit(
 )
 
 # %%
-xref = final.select(
-    "master_customer_id", "dms_customer_id", "crm_id",
-    "source_presence", "match_score",
-).withColumn("_batch_id", F.lit(batch_id)) \
- .withColumn("_silver_ts", F.current_timestamp())
+xref = add_silver_audit(
+    final.select("master_customer_id", "dms_customer_id", "crm_id", "source_presence", "match_score"),
+    batch_id, "mdm",
+    ["master_customer_id", "dms_customer_id", "crm_id", "source_presence", "match_score"],
+).select("master_customer_id", "dms_customer_id", "crm_id", "source_presence", "match_score",
+         *SILVER_AUDIT_COLUMNS)
 
 # %%
 customer_result = merge_into_silver(customer, "silver.customer", ["master_customer_id"])
