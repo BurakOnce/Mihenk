@@ -213,6 +213,97 @@ so re-reading is harmless. Skipping would lose rows permanently.
 
 ---
 
+## 5b. Silver, Gold and the daily orchestration
+
+Bronze is only the first third. On its own, `pl_bronze_ingest` leaves Silver to
+be run by hand from four notebooks and Gold to be run from SSMS with an `EXEC`.
+That is fine for a first end-to-end run and wrong for anything that runs twice.
+Three more pipelines close the gap; their definitions are in `fabric/pipelines/`
+and follow exactly the same logging contract as Bronze.
+
+```
+pl_daily_load                    ← the only thing the schedule triggers
+├─ Set batch id                  one batch_id for the whole night
+├─ Bronze     InvokePipeline     pl_bronze_ingest      (batch_id)
+├─ Silver     InvokePipeline     pl_silver_transform   (batch_id, pii_salt)   on Bronze success
+└─ Gold       InvokePipeline     pl_gold_load          (batch_id)             on Silver success
+```
+
+**`pl_silver_transform`** — four notebooks, strictly in order, each one a logged
+step:
+
+```
+Set batch id                 SetVariable   from parameter, or generated
+Start batch                  Script        EXEC ctl.usp_start_batch @layer='silver'
+Log start 10_silver_master   Script        EXEC ctl.usp_log_step_start  -> run_id
+Run 10_silver_master         Notebook      batch_id, pii_salt
+Log success / Log failure    Script        EXEC ctl.usp_log_step_end  (rows_written from exitValue)
+Log start 20_silver_customer_mdm ... Run ... (batch_id, pii_salt, match_threshold=55) ... success/failure
+Log start 30_silver_transaction  ... Run ... (batch_id, pii_salt)                    ... success/failure
+Read dq rules                Lookup        SELECT ... FROM ctl.dq_rule WHERE is_active = 1
+Log start 40_silver_dq       Script
+Run 40_silver_dq             Notebook      batch_id, rules_json = @string(activity('Read dq rules').output.value)
+Log success / Log failure    Script        (rows_quarantined from exitValue)
+End batch                    Script        on Succeeded | Failed | Skipped of the last run
+```
+
+Each `Log start` depends on the *previous step's* `Log success`, so a failure
+anywhere stops the chain: the failed step is logged with its error message, the
+later steps are skipped, and `End batch` still closes the batch so
+`ctl.vw_batch_reconciliation` shows an honest picture rather than a batch that
+never ended.
+
+**`pl_gold_load`** — two logged Script steps, no notebooks:
+
+```
+Start batch (gold)  →  Run usp_load_gold  →  Run usp_verify_gold  →  End batch
+```
+
+`usp_load_gold` is the incremental path (dimensions, inferred members, facts,
+aggregates). The backfill procedures are deliberately *not* here — they are the
+one-time first load (`usp_initial_load`) and re-running them is guarded anyway.
+
+### Building them
+
+Same two routes as §5. If importing the JSON, replace every `REPLACE_WITH_*`
+placeholder: the four notebook ids, the three pipeline ids (for
+`pl_daily_load`), the Warehouse connection. If building in the UI, the tables
+above are the spec; the only non-obvious settings are:
+
+- **Notebook activity parameters:** `batch_id` and `pii_salt` are type *string*;
+  `match_threshold` is type *int* (a string here would make Spark compare
+  `match_score >= "55"`). `rules_json` is string.
+- **`Read dq rules` Lookup:** `firstRowOnly = false`. Its output is an array;
+  `@string(...)` turns it into the JSON text the DQ notebook expects.
+- **`End batch` dependency:** on the last `Run` activity with *Succeeded,
+  Failed and Skipped* all ticked — not "Completed", which excludes Skipped.
+- **`Log start` → `@source_id = NULL`:** Silver and Gold steps are not per-source,
+  so `ctl.pipeline_run_log.source_id` stays empty for them; `step_name` carries
+  the notebook or procedure name instead.
+- **InvokePipeline in `pl_daily_load`:** `waitOnCompletion = true`, and the
+  child's `batch_id` parameter bound to `@variables('batch_id')` so all three
+  layers share one id.
+
+### Scheduling
+
+Only `pl_daily_load` gets a schedule (pipeline → Schedule → daily, e.g. 02:00).
+The three children are never scheduled directly; running one by hand for a
+re-run is fine and it will generate its own `batch_id` if none is passed.
+
+### The one thing this changes about the notebooks
+
+Nothing in their code. Every Silver notebook already had a
+`tags=["parameters"]` cell and already returned its summary through
+`notebookutils.notebook.exit`. The pipeline is the missing caller, not a
+rewrite — which is the point of having built them that way.
+
+**`pii_salt` is a pipeline parameter, not a notebook default.** The value in
+the notebooks is a placeholder. In a real deployment the parameter is bound to a
+Key Vault secret at the `pl_daily_load` level and flows down; nothing about the
+salt lives in a `.py` file or in Git.
+
+---
+
 ## 6. What to expect on the first run
 
 | | |

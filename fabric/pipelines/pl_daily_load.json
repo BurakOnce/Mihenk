@@ -1,0 +1,123 @@
+{
+  "name": "pl_daily_load",
+  "properties": {
+    "description": "Günlük ana pipeline: Bronze → Silver → Gold, tek batch_id. Zamanlama Fabric'te bu pipeline'ın Schedule ayarından (ör. her gece 02:00). Bir katman düşerse sonraki başlamaz.",
+    "activities": [
+      {
+        "name": "Set batch id",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "batch_id",
+          "value": {
+            "value": "@if(empty(pipeline().parameters.batch_id), concat('B', formatDateTime(utcnow(), 'yyyyMMddHHmmss')), pipeline().parameters.batch_id)",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "Bronze",
+        "type": "InvokePipeline",
+        "dependsOn": [
+          {
+            "activity": "Set batch id",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "pipelineId": "REPLACE_WITH_PIPELINE_ID_PL_BRONZE_INGEST",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "waitOnCompletion": true,
+          "parameters": {
+            "batch_id": {
+              "value": "@variables('batch_id')",
+              "type": "Expression"
+            }
+          }
+        }
+      },
+      {
+        "name": "Silver",
+        "type": "InvokePipeline",
+        "dependsOn": [
+          {
+            "activity": "Bronze",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "pipelineId": "REPLACE_WITH_PIPELINE_ID_PL_SILVER_TRANSFORM",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "waitOnCompletion": true,
+          "parameters": {
+            "batch_id": {
+              "value": "@variables('batch_id')",
+              "type": "Expression"
+            },
+            "pii_salt": {
+              "value": "@pipeline().parameters.pii_salt",
+              "type": "Expression"
+            }
+          }
+        }
+      },
+      {
+        "name": "Gold",
+        "type": "InvokePipeline",
+        "dependsOn": [
+          {
+            "activity": "Silver",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "pipelineId": "REPLACE_WITH_PIPELINE_ID_PL_GOLD_LOAD",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "waitOnCompletion": true,
+          "parameters": {
+            "batch_id": {
+              "value": "@variables('batch_id')",
+              "type": "Expression"
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "batch_id": {
+        "type": "string",
+        "defaultValue": ""
+      },
+      "pii_salt": {
+        "type": "string",
+        "defaultValue": "REPLACE_WITH_KEY_VAULT_SECRET"
+      }
+    },
+    "variables": {
+      "batch_id": {
+        "type": "String"
+      }
+    }
+  }
+}

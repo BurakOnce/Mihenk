@@ -65,7 +65,7 @@ flowchart LR
 |---|---|---|
 | Generation | Local Python — `pandas` + `Faker` | Seeded, reproducible, ~3 years of history |
 | Landing | Lakehouse OneLake `Files/` | Files exactly as a source system would emit them |
-| Orchestration | Data Factory pipeline | Metadata-driven — a new source is a row in `ctl.source_config`, not new code |
+| Orchestration | Data Factory pipelines | `pl_daily_load` runs Bronze → Silver → Gold under one batch id; Bronze is metadata-driven — a new source is a row in `ctl.source_config`, not new code |
 | Bronze | PySpark notebook → Delta | Raw, append-only, no transformation, mandatory audit columns |
 | Silver | PySpark notebook → Delta | Typed, conformed, deduplicated, TRY-normalised, PII-masked, DQ-checked, idempotent upsert |
 | Gold | T-SQL → Warehouse | Star schema, surrogate keys, SCD Type 2, aggregates |
@@ -176,7 +176,7 @@ mihenk/
 │   └── 03_gold/            Star schema DDL, SCD2 and fact load procedures
 ├── fabric/
 │   ├── notebooks/          PySpark: Bronze and Silver
-│   ├── pipelines/          Data Factory JSON exports
+│   ├── pipelines/          Data Factory JSON: pl_daily_load → pl_bronze_ingest, pl_silver_transform, pl_gold_load
 │   └── setup_steps.md      What to create in Fabric, where, in what order
 ├── powerbi/
 │   ├── semantic_model.md   Tables, relationships, report pages
@@ -292,11 +292,19 @@ then open `http://localhost:8000`.
 | 5 | Power BI semantic model, DAX, RLS, generated documentation | ✅ Done |
 
 **Phases 0–5 have run end to end on a real Fabric capacity** (Azure
-pay-as-you-go F2): the Data Factory pipeline ingesting all 17 sources, all
+pay-as-you-go F2): the Bronze pipeline ingesting all 17 sources, all
 four Silver notebooks, the full Gold layer via `gold.usp_initial_load`, and a
 Power BI report on a Direct Lake semantic model. Every verification item in
 [ADR-0002](docs/adr/0002-hybrid-spark-and-tsql-architecture.md) has a real
 result and a date.
+
+In that first run Silver was started notebook by notebook and Gold from an
+`EXEC` in SSMS. The orchestration that removes those manual steps —
+`pl_silver_transform`, `pl_gold_load` and the scheduled `pl_daily_load` that
+chains all three layers under one batch id — is defined in
+[`fabric/pipelines/`](fabric/pipelines/) and documented in
+[`fabric/setup_steps.md`](fabric/setup_steps.md) §5b, but has not yet been
+executed on the capacity. It is listed here as such rather than assumed.
 
 ---
 

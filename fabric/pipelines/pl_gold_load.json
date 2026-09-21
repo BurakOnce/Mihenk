@@ -1,0 +1,423 @@
+{
+  "name": "pl_gold_load",
+  "properties": {
+    "description": "Gold katmanı: usp_load_gold (dimension'lar, inferred members, fact'ler, aggregate'ler) ve ardından usp_verify_gold. Backfill buradan çağrılmaz; o tek seferlik ilk yükleme (usp_initial_load).",
+    "activities": [
+      {
+        "name": "Set batch id",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "batch_id",
+          "value": {
+            "value": "@if(empty(pipeline().parameters.batch_id), concat('B', formatDateTime(utcnow(), 'yyyyMMddHHmmss')), pipeline().parameters.batch_id)",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "Start batch",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Set batch id",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_start_batch @batch_id = '@{variables('batch_id')}', @layer = 'gold';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start usp_load_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Start batch",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'gold', @step_name = 'usp_load_gold';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run usp_load_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log start usp_load_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC gold.usp_load_gold @batch_id = '@{variables('batch_id')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success usp_load_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run usp_load_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_load_gold').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure usp_load_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run usp_load_gold",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_load_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_load_gold').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start usp_verify_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log success usp_load_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'gold', @step_name = 'usp_verify_gold';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run usp_verify_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log start usp_verify_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC gold.usp_verify_gold @batch_id = '@{variables('batch_id')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success usp_verify_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run usp_verify_gold",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_verify_gold').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure usp_verify_gold",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run usp_verify_gold",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_verify_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_verify_gold').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "End batch",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run usp_verify_gold",
+            "dependencyConditions": [
+              "Succeeded",
+              "Failed",
+              "Skipped"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_end_batch @batch_id = '@{variables('batch_id')}', @layer = 'gold';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "batch_id": {
+        "type": "string",
+        "defaultValue": ""
+      }
+    },
+    "variables": {
+      "batch_id": {
+        "type": "String"
+      }
+    }
+  }
+}

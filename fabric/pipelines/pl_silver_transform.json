@@ -1,0 +1,786 @@
+{
+  "name": "pl_silver_transform",
+  "properties": {
+    "description": "Silver katmanı: dört notebook sırayla, tek batch_id, her adım ctl.pipeline_run_log'a. Bir adım düşerse sonrakiler atlanır, batch yine kapatılır.",
+    "activities": [
+      {
+        "name": "Set batch id",
+        "type": "SetVariable",
+        "dependsOn": [],
+        "typeProperties": {
+          "variableName": "batch_id",
+          "value": {
+            "value": "@if(empty(pipeline().parameters.batch_id), concat('B', formatDateTime(utcnow(), 'yyyyMMddHHmmss')), pipeline().parameters.batch_id)",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "Start batch",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Set batch id",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_start_batch @batch_id = '@{variables('batch_id')}', @layer = 'silver';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start 10_silver_master",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Start batch",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'silver', @step_name = '10_silver_master';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run 10_silver_master",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Log start 10_silver_master",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "notebookId": "REPLACE_WITH_NOTEBOOK_ID_10_SILVER_MASTER",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "parameters": {
+            "batch_id": {
+              "value": {
+                "value": "@variables('batch_id')",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "pii_salt": {
+              "value": {
+                "value": "@pipeline().parameters.pii_salt",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success 10_silver_master",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 10_silver_master",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED', @rows_written = @{json(activity('Run 10_silver_master').output.result.exitValue).rows_written};",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure 10_silver_master",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 10_silver_master",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 10_silver_master').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start 20_silver_customer_mdm",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log success 10_silver_master",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'silver', @step_name = '20_silver_customer_mdm';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run 20_silver_customer_mdm",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Log start 20_silver_customer_mdm",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "notebookId": "REPLACE_WITH_NOTEBOOK_ID_20_SILVER_CUSTOMER_MDM",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "parameters": {
+            "batch_id": {
+              "value": {
+                "value": "@variables('batch_id')",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "pii_salt": {
+              "value": {
+                "value": "@pipeline().parameters.pii_salt",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "match_threshold": {
+              "value": {
+                "value": "@pipeline().parameters.match_threshold",
+                "type": "Expression"
+              },
+              "type": "int"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success 20_silver_customer_mdm",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 20_silver_customer_mdm",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED', @rows_written = @{json(activity('Run 20_silver_customer_mdm').output.result.exitValue).rows_written};",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure 20_silver_customer_mdm",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 20_silver_customer_mdm",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 20_silver_customer_mdm').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log start 30_silver_transaction",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Log success 20_silver_customer_mdm",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'silver', @step_name = '30_silver_transaction';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run 30_silver_transaction",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Log start 30_silver_transaction",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "notebookId": "REPLACE_WITH_NOTEBOOK_ID_30_SILVER_TRANSACTION",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "parameters": {
+            "batch_id": {
+              "value": {
+                "value": "@variables('batch_id')",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "pii_salt": {
+              "value": {
+                "value": "@pipeline().parameters.pii_salt",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success 30_silver_transaction",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 30_silver_transaction",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED', @rows_written = @{json(activity('Run 30_silver_transaction').output.result.exitValue).rows_written};",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure 30_silver_transaction",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 30_silver_transaction",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 30_silver_transaction').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Read dq rules",
+        "type": "Lookup",
+        "dependsOn": [
+          {
+            "activity": "Log success 30_silver_transaction",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderQuery": {
+              "value": "SELECT rule_id, rule_code, target_table, severity, quarantine_on_fail, violation_sql FROM ctl.dq_rule WHERE is_active = 1 AND target_layer = 'silver' ORDER BY rule_id;",
+              "type": "Expression"
+            }
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "linkedService": {
+              "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+                  "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+                  "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+                }
+              }
+            }
+          },
+          "firstRowOnly": false
+        }
+      },
+      {
+        "name": "Log start 40_silver_dq",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Read dq rules",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_start @batch_id = '@{variables('batch_id')}', @source_id = NULL, @layer = 'silver', @step_name = '40_silver_dq';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Run 40_silver_dq",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "Log start 40_silver_dq",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "notebookId": "REPLACE_WITH_NOTEBOOK_ID_40_SILVER_DQ",
+          "workspaceId": "REPLACE_WITH_WORKSPACE_ID",
+          "parameters": {
+            "batch_id": {
+              "value": {
+                "value": "@variables('batch_id')",
+                "type": "Expression"
+              },
+              "type": "string"
+            },
+            "rules_json": {
+              "value": {
+                "value": "@string(activity('Read dq rules').output.value)",
+                "type": "Expression"
+              },
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log success 40_silver_dq",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 40_silver_dq",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'SUCCEEDED', @rows_written = @{json(activity('Run 40_silver_dq').output.result.exitValue).rows_quarantined};",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "Log failure 40_silver_dq",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 40_silver_dq",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 40_silver_dq').output.error.message), '''', '''''')}';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      },
+      {
+        "name": "End batch",
+        "type": "Script",
+        "dependsOn": [
+          {
+            "activity": "Run 40_silver_dq",
+            "dependencyConditions": [
+              "Succeeded",
+              "Failed",
+              "Skipped"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.02:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30
+        },
+        "typeProperties": {
+          "scripts": [
+            {
+              "type": "Query",
+              "text": {
+                "value": "EXEC ctl.usp_end_batch @batch_id = '@{variables('batch_id')}', @layer = 'silver';",
+                "type": "Expression"
+              }
+            }
+          ]
+        },
+        "linkedService": {
+          "name": "REPLACE_WITH_WAREHOUSE_CONNECTION",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "REPLACE_WITH_WAREHOUSE_ARTIFACT_ID",
+              "endpoint": "REPLACE_WITH_WAREHOUSE_SQL_ENDPOINT",
+              "workspaceId": "REPLACE_WITH_WORKSPACE_ID"
+            }
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "batch_id": {
+        "type": "string",
+        "defaultValue": "",
+        "description": "Ana pipeline'dan gelir; boşsa üretilir."
+      },
+      "pii_salt": {
+        "type": "string",
+        "defaultValue": "REPLACE_WITH_KEY_VAULT_SECRET",
+        "description": "Üretimde Key Vault'tan; parametre olarak geçilir, koda yazılmaz."
+      },
+      "match_threshold": {
+        "type": "int",
+        "defaultValue": 55,
+        "description": "MDM eşleşme eşiği."
+      }
+    },
+    "variables": {
+      "batch_id": {
+        "type": "String"
+      }
+    }
+  }
+}
