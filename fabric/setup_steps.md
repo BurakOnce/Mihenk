@@ -3,11 +3,12 @@
 What to create, where, and in what order. Written so that someone with a fresh
 workspace can reproduce the platform from this repository alone.
 
-Everything here is *reproducible*, but note honestly: at the time of writing the
-platform has been built and its artefacts exported, and the verification items in
-[ADR-0002](../docs/adr/0002-hybrid-spark-and-tsql-architecture.md) are still
-`Pending` because no Fabric capacity was available. Those items are listed in
-§7 and are the first thing to run once capacity exists.
+Everything here has been run for real on an Azure F2 capacity (2026-09-13/14):
+Bronze through `pl_bronze_ingest`, the four Silver notebooks, the full Gold load,
+and a Direct Lake report. Every verification item in
+[ADR-0002](../docs/adr/0002-hybrid-spark-and-tsql-architecture.md) has a result.
+What that first run did *by hand* — starting Silver notebook by notebook and Gold
+from SSMS — is what §5b's orchestration pipelines replace.
 
 ---
 
