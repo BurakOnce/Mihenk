@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "c10aptionB0000010",
+  "position": {
+    "x": 880,
+    "y": 740,
+    "z": 0,
+    "height": 290,
+    "width": 960
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "En yüksek servis geliri Bozkurt Oto'da (270,4 milyon TL). En sık görülen servis türü Arıza Onarımı (51.593 kayıt).",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#5B6472",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

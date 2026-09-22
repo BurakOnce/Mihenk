@@ -1,0 +1,51 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "e5f60718293a4b5c6d7e",
+  "position": {
+    "x": 1540,
+    "y": 20,
+    "z": 0,
+    "width": 360,
+    "height": 140
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_repair_order"
+                    }
+                  },
+                  "Property": "Ortalama İşlem Süresi (Saat)"
+                }
+              },
+              "queryRef": "fact_repair_order.Ortalama İşlem Süresi (Saat)",
+              "nativeQueryRef": "Ortalama İşlem Süresi (Saat)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "categoryLabels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

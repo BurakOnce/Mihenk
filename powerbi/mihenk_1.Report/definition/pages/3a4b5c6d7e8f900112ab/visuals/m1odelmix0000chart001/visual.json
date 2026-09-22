@@ -1,0 +1,106 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "m1odelmix0000chart001",
+  "position": {
+    "x": 761.58059598988257,
+    "y": 279.93232717465952,
+    "z": 0,
+    "height": 360.20703864386337,
+    "width": 1117.6709827635304
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_model_trim"
+                    }
+                  },
+                  "Property": "Model Adı"
+                }
+              },
+              "queryRef": "dim_model_trim.Model Adı",
+              "nativeQueryRef": "Model Adı",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_vehicle_sale"
+                    }
+                  },
+                  "Property": "Satış Adedi"
+                }
+              },
+              "queryRef": "fact_vehicle_sale.Satış Adedi",
+              "nativeQueryRef": "Satış Adedi"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#BF5B26'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "883835d2c127d85ad6bd",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_model_trim"
+              }
+            },
+            "Property": "Model Adı"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "749911f5365e4846e7a8",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_vehicle_sale"
+              }
+            },
+            "Property": "Satış Adedi"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

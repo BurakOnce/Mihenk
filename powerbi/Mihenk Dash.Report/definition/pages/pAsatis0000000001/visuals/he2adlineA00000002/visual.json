@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "he2adlineA00000002",
+  "position": {
+    "x": 80,
+    "y": 80,
+    "z": 0,
+    "height": 90,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "71,7 milyar TL net satış, 29.431 araç — ortalama fiyat 2.436.377 TL.",
+                    "textStyle": {
+                      "fontSize": "21pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

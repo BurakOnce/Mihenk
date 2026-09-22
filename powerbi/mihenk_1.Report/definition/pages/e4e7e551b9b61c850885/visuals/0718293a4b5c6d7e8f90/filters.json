@@ -1,0 +1,67 @@
+[
+  {
+    "name": "dealerIsCurrentFilter",
+    "field": {
+      "Column": {
+        "Expression": { "SourceRef": { "Entity": "dim_dealer" } },
+        "Property": "is_current"
+      }
+    },
+    "type": "Categorical",
+    "howCreated": "Automatic",
+    "filter": {
+      "Version": 2,
+      "From": [{ "Name": "d", "Entity": "dim_dealer", "Type": 0 }],
+      "Where": [
+        {
+          "Condition": {
+            "In": {
+              "Expressions": [
+                { "Column": { "Expression": { "SourceRef": { "Source": "d" } }, "Property": "is_current" } }
+              ],
+              "Values": [[{ "Literal": { "Value": "true" } }]]
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "dealerTopNFilter",
+    "field": {
+      "Column": {
+        "Expression": { "SourceRef": { "Entity": "dim_dealer" } },
+        "Property": "Bayi Adı"
+      }
+    },
+    "type": "TopN",
+    "howCreated": "User",
+    "filter": {
+      "Version": 2,
+      "From": [
+        { "Name": "d", "Entity": "dim_dealer", "Type": 0 },
+        { "Name": "f", "Entity": "fact_vehicle_sale", "Type": 0 }
+      ],
+      "Where": [
+        {
+          "Condition": {
+            "TopN": {
+              "Expression": {
+                "Column": { "Expression": { "SourceRef": { "Source": "d" } }, "Property": "Bayi Adı" }
+              },
+              "OrderBy": [
+                {
+                  "Direction": 2,
+                  "Expression": {
+                    "Measure": { "Expression": { "SourceRef": { "Source": "f" } }, "Property": "Net Satış Tutarı" }
+                  }
+                }
+              ],
+              "ItemCount": 5
+            }
+          }
+        }
+      ]
+    }
+  }
+]

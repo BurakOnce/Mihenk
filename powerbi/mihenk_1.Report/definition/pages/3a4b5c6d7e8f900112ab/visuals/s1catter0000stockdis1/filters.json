@@ -1,0 +1,26 @@
+[
+  {
+    "name": "dealerIsCurrentFilterScatter",
+    "field": {
+      "Column": { "Expression": { "SourceRef": { "Entity": "dim_dealer" } }, "Property": "is_current" }
+    },
+    "type": "Categorical",
+    "howCreated": "Automatic",
+    "filter": {
+      "Version": 2,
+      "From": [{ "Name": "d", "Entity": "dim_dealer", "Type": 0 }],
+      "Where": [
+        {
+          "Condition": {
+            "In": {
+              "Expressions": [
+                { "Column": { "Expression": { "SourceRef": { "Source": "d" } }, "Property": "is_current" } }
+              ],
+              "Values": [[{ "Literal": { "Value": "true" } }]]
+            }
+          }
+        }
+      ]
+    }
+  }
+]

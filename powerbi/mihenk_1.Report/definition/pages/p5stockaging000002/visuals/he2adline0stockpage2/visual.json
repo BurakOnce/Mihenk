@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "he2adline0stockpage2",
+  "position": {
+    "x": 80,
+    "y": 90,
+    "z": 0,
+    "height": 120,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Araçlar ortalama 88,8 gün stokta bekliyor — bazı bayilerde bu süre 140 günü aşıyor.",
+                    "textStyle": {
+                      "fontSize": "22pt",
+                      "fontWeight": "600",
+                      "color": "#1B1D22",
+                      "fontFamily": "Segoe UI Semibold"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

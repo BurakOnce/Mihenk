@@ -1,0 +1,49 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "h2eaderbanner00002txt",
+  "position": {
+    "x": 40,
+    "y": 14,
+    "z": 1,
+    "width": 900,
+    "height": 72
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Satış Analizi",
+                    "textStyle": {
+                      "fontSize": "24pt",
+                      "fontWeight": "bold",
+                      "color": "#FFFFFF",
+                      "fontFamily": "Segoe UI Semibold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Bayi, model ve stok performansı — güncel bayi verisi",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#C9CCD2",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

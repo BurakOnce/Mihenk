@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "ca7ption0stockpage07",
+  "position": {
+    "x": 1220,
+    "y": 940,
+    "z": 0,
+    "height": 90,
+    "width": 620
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "En yavaş devreden bayi Yücel Motorlu Araçlar (141 gün) — ortalamanın %59 üzerinde, sermaye orada bekliyor.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "italic": true,
+                      "color": "#6B6B66",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

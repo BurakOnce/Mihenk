@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Mihenk Dash"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "92202ea6-f0b6-4c69-a2b2-d1a9fc233b04"
+  }
+}

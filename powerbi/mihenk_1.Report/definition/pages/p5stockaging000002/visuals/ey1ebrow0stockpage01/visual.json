@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "ey1ebrow0stockpage01",
+  "position": {
+    "x": 80,
+    "y": 50,
+    "z": 0,
+    "height": 30,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "INVENTORY · STOK YAŞLANMASI",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "fontWeight": "600",
+                      "color": "#8A8A85",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

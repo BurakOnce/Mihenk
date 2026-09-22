@@ -1,0 +1,171 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "s1catter0000stockdis1",
+  "position": {
+    "x": 761.58059598988257,
+    "y": 660.72262516960086,
+    "z": 0,
+    "height": 368.44034238429452,
+    "width": 1117.6709827635304
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_dealer"
+                    }
+                  },
+                  "Property": "Bayi Adı"
+                }
+              },
+              "queryRef": "dim_dealer.Bayi Adı",
+              "nativeQueryRef": "Bayi Adı",
+              "active": true
+            }
+          ]
+        },
+        "Size": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_vehicle_sale"
+                    }
+                  },
+                  "Property": "Satış Adedi"
+                }
+              },
+              "queryRef": "fact_vehicle_sale.Satış Adedi",
+              "nativeQueryRef": "Satış Adedi"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_vehicle_sale"
+                    }
+                  },
+                  "Property": "İndirim Oranı"
+                }
+              },
+              "queryRef": "fact_vehicle_sale.İndirim Oranı",
+              "nativeQueryRef": "İndirim Oranı",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_vehicle_sale"
+                    }
+                  },
+                  "Property": "Ortalama Stok Süresi (Gün)"
+                }
+              },
+              "queryRef": "fact_vehicle_sale.Ortalama Stok Süresi (Gün)",
+              "nativeQueryRef": "Ortalama Stok Süresi (Gün)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#3F6F60'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "c264653876743a9494bd",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_dealer"
+              }
+            },
+            "Property": "Bayi Adı"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "afbede40eb5097c0908c",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_vehicle_sale"
+              }
+            },
+            "Property": "İndirim Oranı"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "6bd2beb4679303b3e042",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_vehicle_sale"
+              }
+            },
+            "Property": "Ortalama Stok Süresi (Gün)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "42eb726e58c7ebbc0b47",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fact_vehicle_sale"
+              }
+            },
+            "Property": "Satış Adedi"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

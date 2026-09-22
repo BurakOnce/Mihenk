@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "he2adlineC00000002",
+  "position": {
+    "x": 80,
+    "y": 80,
+    "z": 0,
+    "height": 90,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "26.235 müşterinin %54,9'u iki sistemde eşleşti; araçların %83,1'i VIN kontrolünü geçiyor, ortalama stok süresi 88,8 gün.",
+                    "textStyle": {
+                      "fontSize": "21pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "d2esc00000overview02",
+  "position": {
+    "x": 80,
+    "y": 92,
+    "z": 0,
+    "height": 30,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Satış hacmi, fiyatlama ve servis operasyonuna dair temel göstergeler.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#5B6472",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
