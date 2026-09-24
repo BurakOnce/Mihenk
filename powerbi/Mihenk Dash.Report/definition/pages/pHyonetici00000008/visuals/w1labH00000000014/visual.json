@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "w1labH00000000014",
+  "position": {
+    "x": 1460,
+    "y": 672,
+    "z": 0,
+    "height": 34,
+    "width": 380
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Açık İş Emirleri",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#B42318",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

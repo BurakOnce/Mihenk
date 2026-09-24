@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "b1donutH0000000012",
+  "position": {
+    "x": 80,
+    "y": 672,
+    "z": 0,
+    "height": 360,
+    "width": 560
+  },
+  "visual": {
+    "visualType": "donutChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_service_type"
+                    }
+                  },
+                  "Property": "Servis Türü"
+                }
+              },
+              "queryRef": "dim_service_type.Servis Türü",
+              "nativeQueryRef": "Servis Türü",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_repair_order"
+                    }
+                  },
+                  "Property": "Servis Kaydı Sayısı"
+                }
+              },
+              "queryRef": "fact_repair_order.Servis Kaydı Sayısı",
+              "nativeQueryRef": "Servis Kaydı Sayısı"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

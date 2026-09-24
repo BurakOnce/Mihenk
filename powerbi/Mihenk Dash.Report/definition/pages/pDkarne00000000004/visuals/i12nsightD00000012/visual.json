@@ -1,0 +1,210 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "i12nsightD00000012",
+  "position": {
+    "x": 1420,
+    "y": 340,
+    "z": 0,
+    "height": 660,
+    "width": 420
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "NE GÖRÜYORUZ",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#8A8A85",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": " ",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Yücel Motorlu Araçlar",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#C8553D",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "İndirimde 2. (%10,2), stok süresinde 1. (141 gün). Ağın en pahalı kombinasyonu: marj veriyor, stok yine de bekliyor.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": " ",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Ateş ve Yıldız",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#C8553D",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Ateş indirimde 1. (%10,5), stokta 4. (121 gün). Yıldız indirimde 3. (%10,0), stokta 3. (127 gün). Aynı desen.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": " ",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Bozkurt Oto",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#1F3A5F",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Servis gelirinde ağın lideri (270 milyon TL) ama stok süresinde 2. (132 gün). Servis güçlü, satış devri yavaş.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": " ",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Toprak Oto",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#1F3A5F",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Net satışta lider (3,59 milyar TL) ve indirim listesinin ilk beşinde yok. Hacim, indirimle alınmıyor.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": " ",
+                    "textStyle": {
+                      "fontSize": "6pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Öneri: indirim yetkisini stok yaşına bağlayın. 120 günü aşmayan araçta ek indirim onaya tabi olsun.",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

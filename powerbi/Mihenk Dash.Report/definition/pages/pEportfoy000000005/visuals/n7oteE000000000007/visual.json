@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "n7oteE000000000007",
+  "position": {
+    "x": 80,
+    "y": 960,
+    "z": 0,
+    "height": 60,
+    "width": 520
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Sağdaki grafikler birbirine bağlı: bir modele ya da renge tıklayınca sayfa o seçime göre süzülür.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#9AA3AE",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,9 +1,14 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
   "pageOrder": [
+    "pEportfoy000000005",
+    "pGanatomi000000007",
+    "pDkarne00000000004",
+    "pFnabiz00000000006",
+    "pHyonetici00000008",
     "pAsatis0000000001",
     "pBservis0000000002",
     "pCveri00000000003"
   ],
-  "activePageName": "pAsatis0000000001"
+  "activePageName": "pDkarne00000000004"
 }

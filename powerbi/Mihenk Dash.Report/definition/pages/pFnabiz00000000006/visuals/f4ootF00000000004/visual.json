@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "f4ootF00000000004",
+  "position": {
+    "x": 80,
+    "y": 1045,
+    "z": 0,
+    "height": 25,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Kaynak: MIHENK semantic model. Kart değerleri sayfadaki filtrelere göre güncellenir.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#6E6A62",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

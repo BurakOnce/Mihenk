@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "su3bheadD000000003",
+  "position": {
+    "x": 80,
+    "y": 130,
+    "z": 0,
+    "height": 40,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "En çok indirim yapan 5 bayiden 3'ü, stoku en uzun bekleten 5 bayinin de içinde. 14 bayi, dört gösterge, tek sayfa.",
+                    "textStyle": {
+                      "fontSize": "13pt",
+                      "color": "#5B6472",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

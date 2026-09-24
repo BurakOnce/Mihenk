@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "ey1ebrowF000000001",
+  "position": {
+    "x": 80,
+    "y": 40,
+    "z": 0,
+    "height": 25,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "AYLIK NABIZ · ZAMAN İÇİNDE BAYİ AĞI",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#C0392B",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "700"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -28,7 +28,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -67,7 +67,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -143,7 +143,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -182,7 +182,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -190,7 +190,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 10_silver_master').output.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 10_silver_master').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 10_silver_master').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -221,7 +221,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -304,7 +304,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -343,7 +343,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -351,7 +351,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 20_silver_customer_mdm').output.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 20_silver_customer_mdm').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 20_silver_customer_mdm').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -382,7 +382,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -458,7 +458,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -497,7 +497,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -505,7 +505,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 30_silver_transaction').output.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 30_silver_transaction').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 30_silver_transaction').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -536,7 +536,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -577,7 +577,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -653,7 +653,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -692,7 +692,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -700,7 +700,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 40_silver_dq').output.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start 40_silver_dq').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run 40_silver_dq').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -723,7 +723,15 @@
         "type": "Script",
         "dependsOn": [
           {
-            "activity": "Run 40_silver_dq",
+            "activity": "Log success 40_silver_dq",
+            "dependencyConditions": [
+              "Succeeded",
+              "Failed",
+              "Skipped"
+            ]
+          },
+          {
+            "activity": "Log failure 40_silver_dq",
             "dependencyConditions": [
               "Succeeded",
               "Failed",
@@ -733,7 +741,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {

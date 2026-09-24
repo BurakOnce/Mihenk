@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "f3ootG00000000015",
+  "position": {
+    "x": 80,
+    "y": 960,
+    "z": 0,
+    "height": 80,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Nasıl okunur: soldaki grafik bir servis türünün kaç kayıt açtığını, sağdaki ne kadar gelir getirdiğini gösterir. Adette büyük ama gelirde küçük kalan tür, düşük birim gelirli iş demektir. En sık tür Arıza Onarımı: 51.593 kayıt, toplamın %29,2'si. Denklemdeki sonuç kutuları ağ genelini gösterir ve filtrelerle değişmez.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#5E6B78",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

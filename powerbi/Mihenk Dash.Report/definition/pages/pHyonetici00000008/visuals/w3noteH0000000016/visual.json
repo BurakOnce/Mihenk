@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "w3noteH0000000016",
+  "position": {
+    "x": 1460,
+    "y": 906,
+    "z": 0,
+    "height": 126,
+    "width": 380
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Henüz kapatılmamış servis kayıtları. Sıfırdan büyük olduğu sürece takip gerektirir.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#5B6472",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

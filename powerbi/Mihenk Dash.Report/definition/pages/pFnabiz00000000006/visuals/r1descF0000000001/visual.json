@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "r1descF0000000001",
+  "position": {
+    "x": 80,
+    "y": 255,
+    "z": 0,
+    "height": 80,
+    "width": 300
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Araç satışlarından gelen net ciro. Toplam 71,7 milyar TL.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#6E6A62",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

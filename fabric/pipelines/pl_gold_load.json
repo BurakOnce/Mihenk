@@ -28,7 +28,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -67,7 +67,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -106,7 +106,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -145,7 +145,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -184,7 +184,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -192,7 +192,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start reset_facts').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run reset facts').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start reset_facts').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run reset facts').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -223,7 +223,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -301,7 +301,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -340,7 +340,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -348,7 +348,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_load_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_load_gold').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_load_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_load_gold').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -379,7 +379,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -418,7 +418,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -457,7 +457,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -496,7 +496,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {
@@ -504,7 +504,7 @@
             {
               "type": "Query",
               "text": {
-                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_verify_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_verify_gold').output.error.message), '''', '''''')}';",
+                "value": "EXEC ctl.usp_log_step_end @run_id = @{activity('Log start usp_verify_gold').output.resultSets[0].rows[0].run_id}, @status = 'FAILED', @error_message = '@{replace(string(activity('Run usp_verify_gold').error.message), '''', '''''')}';",
                 "type": "Expression"
               }
             }
@@ -527,7 +527,15 @@
         "type": "Script",
         "dependsOn": [
           {
-            "activity": "Run usp_verify_gold",
+            "activity": "Log success usp_verify_gold",
+            "dependencyConditions": [
+              "Succeeded",
+              "Failed",
+              "Skipped"
+            ]
+          },
+          {
+            "activity": "Log failure usp_verify_gold",
             "dependencyConditions": [
               "Succeeded",
               "Failed",
@@ -537,7 +545,7 @@
         ],
         "policy": {
           "timeout": "0.02:00:00",
-          "retry": 0,
+          "retry": 3,
           "retryIntervalInSeconds": 30
         },
         "typeProperties": {

@@ -1,0 +1,139 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 147.77476507175902
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 240.01312182043307,
+            "y": 1011.1705743388113
+          },
+          "nodeIndex": "dim_customer",
+          "nodeLineageTag": "0701eb94-858f-4a42-8c11-38d274b4382d",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 526.83510297600208,
+            "y": -49.83879331184653
+          },
+          "nodeIndex": "dim_date",
+          "nodeLineageTag": "8f5610bd-d431-4fa6-a403-1b47fa1bd43c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 684.16408039244163,
+            "y": 303.77332050894677
+          },
+          "nodeIndex": "dim_dealer",
+          "nodeLineageTag": "775b6883-af55-4722-8081-3e8394910214",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 859.4496494540881,
+            "y": 657.48356141904139
+          },
+          "nodeIndex": "dim_employee",
+          "nodeLineageTag": "cb8299e9-3f2f-41fc-b07c-5ca37447e735",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 657.41675736542311
+          },
+          "nodeIndex": "dim_model_trim",
+          "nodeLineageTag": "eaf252e3-7474-41db-9268-714ff0bf7c87",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1442.7057687671895,
+            "y": -50
+          },
+          "nodeIndex": "dim_service_type",
+          "nodeLineageTag": "53ab70a2-5398-4e1f-ab47-d85d81a9306e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1075.7250398033398,
+            "y": 303.9018261847
+          },
+          "nodeIndex": "dim_vehicle",
+          "nodeLineageTag": "1bb90c35-c17b-4b11-9069-748bc66cd6d7",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1156.7330890403609,
+            "y": -49.766533092830741
+          },
+          "nodeIndex": "fact_repair_order",
+          "nodeLineageTag": "59e080f2-b9c7-4091-b3ee-5d6a7c763576",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 442.13752303675108,
+            "y": 657.43072664554427
+          },
+          "nodeIndex": "fact_vehicle_sale",
+          "nodeLineageTag": "f8bd7f20-edec-4e93-9bed-d36cdce76a51",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Tüm tablolar",
+      "zoomValue": 50.346892102823148,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Tüm tablolar",
+  "defaultDiagram": "Tüm tablolar"
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "r2descF0000000002",
+  "position": {
+    "x": 80,
+    "y": 540,
+    "z": 0,
+    "height": 80,
+    "width": 300
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Ay içinde açılan servis kayıtları. Toplam 176.414 kayıt.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#6E6A62",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

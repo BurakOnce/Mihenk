@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "r3descF0000000003",
+  "position": {
+    "x": 80,
+    "y": 825,
+    "z": 0,
+    "height": 80,
+    "width": 300
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Satılan yeni araçların stokta beklediği ortalama gün. Genel ortalama 88,8 gün.",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "color": "#6E6A62",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -91,7 +91,8 @@ paths = resolve_paths(config)
 if not paths:
 
     utils.notebook.exit(json.dumps(
-        {"status": "SKIPPED", "reason": "no new files", "rows_read": 0, "rows_written": 0}
+        {"status": "SKIPPED", "reason": "no new files", "rows_read": 0, "rows_written": 0,
+         "rows_rejected": 0, "files_read": 0, "watermark_to": ""}
     ))
 
 # %%

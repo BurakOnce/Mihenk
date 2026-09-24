@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "su3bheadE000000003",
+  "position": {
+    "x": 80,
+    "y": 250,
+    "z": 0,
+    "height": 110,
+    "width": 520
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "29.431 satışın 8.754'ü beyaz araç (%29,7). En çok satan model Kobra (1.268 adet). Portföy geniş, talep birkaç noktada toplanıyor.",
+                    "textStyle": {
+                      "fontSize": "12pt",
+                      "color": "#9AA3AE",
+                      "fontFamily": "Segoe UI"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

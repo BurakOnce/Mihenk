@@ -340,9 +340,14 @@ the actual available properties (`status, result, message,
 SparkMonitoringURL, ...`) and the error text sits directly at `output.message`,
 not nested under `output.error`. This was a latent bug in `pl_bronze_ingest.json`
 from the start — Bronze had simply never failed a notebook activity in a run
-that reached that branch. Script activities are unaffected; their error output
-does live under `output.error.message`, so every `Log failure` step now branches
-on the activity type it is watching.
+that reached that branch.
+
+`output.message` turned out to be fragile too: when the notebook job fails to
+*start* (a stale notebook reference returned 401), `output` only carries
+`effectiveIntegrationRuntime, executionDuration, ...` and the logging step
+failed again. Every `Log failure` step now reads `activity('Run X').error.message`
+— the activity-level error object, which exists for any failed activity
+regardless of type or of how far it got.
 
 Neither of these would have been caught by running each notebook by hand from
 the workspace UI, which is exactly the gap the orchestration was built to close.

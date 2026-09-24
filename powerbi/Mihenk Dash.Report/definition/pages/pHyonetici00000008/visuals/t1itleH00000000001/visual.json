@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "t1itleH00000000001",
+  "position": {
+    "x": 80,
+    "y": 34,
+    "z": 0,
+    "height": 50,
+    "width": 1760
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Yönetici Özeti",
+                    "textStyle": {
+                      "fontSize": "26pt",
+                      "color": "#1B2430",
+                      "fontFamily": "Segoe UI Semibold",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

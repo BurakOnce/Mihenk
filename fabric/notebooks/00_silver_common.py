@@ -271,12 +271,25 @@ def merge_into_silver(
     partition_by: list[str] = None,
 ) -> dict:
     """silver delta tablosuna upsert, ilk çalıştırmada tabloyu oluşturur"""
-    if not spark.catalog.tableExists(table_name):
-        writer = df.write.format("delta").mode("overwrite")
+    def _overwrite() -> dict:
+        writer = df.write.format("delta").mode("overwrite").option("overwriteSchema", "true")
         if partition_by:
             writer = writer.partitionBy(*partition_by)
         writer.saveAsTable(table_name)
         return {"created": True, "rows": df.count(), "updated": 0, "inserted": df.count()}
+
+    if not spark.catalog.tableExists(table_name):
+        return _overwrite()
+
+    # İlk xref yazımı audit sütunlarını eksik bırakmıştı. MERGE t._row_hash
+    # bekler; sütun yoksa AnalysisException. Şema kayınca üzerine yaz —
+    # Silver güncel durumu tutar, overwrite doğru.
+    target_columns = set(spark.table(table_name).columns)
+    source_columns = set(df.columns)
+    if "_row_hash" not in target_columns or "_row_hash" not in source_columns:
+        return _overwrite()
+    if source_columns - target_columns:
+        return _overwrite()
 
     target = DeltaTable.forName(spark, table_name)
     condition = " AND ".join(f"t.{k} = s.{k}" for k in key_columns)

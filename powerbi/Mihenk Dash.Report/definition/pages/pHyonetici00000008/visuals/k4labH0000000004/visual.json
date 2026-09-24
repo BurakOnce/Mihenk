@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "k4labH0000000004",
+  "position": {
+    "x": 1512,
+    "y": 132,
+    "z": 0,
+    "height": 34,
+    "width": 328
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Ort. İşlem Süresi",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#5B6472",
+                      "fontFamily": "Segoe UI",
+                      "fontWeight": "600"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
